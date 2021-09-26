@@ -5,8 +5,12 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    currentRoute: window.location.pathname
   },
   mutations: {
+    updateRoute: function (state, newRoute) {
+      state.currentRoute = newRoute
+    }
   },
   actions: {
   },
