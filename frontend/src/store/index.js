@@ -3,39 +3,36 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-const axios = require('axios');
-
-const instance = axios.create({
-  baseURL: 'http://127.0.0.1:3000/api'
-});
-
 let user = localStorage.getItem('user');
 if(!user){
   user = {
     userId: -1,
+    firstname: '',
+    avatar: '',
     token: null
   }
 }else{
   user = JSON.parse(user);
-  instance.defaults.headers.common['Authorization'] = user.token;
 }
+
+const axios = require('axios');
+
+const instance = axios.create({
+  baseURL: 'http://127.0.0.1:3000/api',
+  headers: {'Authorization': 'Bearer '+ user.token}
+});
 
 export default new Vuex.Store({
   state: {
     currentRoute: window.location.pathname,
     status: '',
     user: user,
-    userInfos: {
-      email: '',
-      firstname: '',
-      lastname: '',
-      avatar: '',
-      bio: ''
-    },
     profilInfos: {
+      id: '',
       email: '',
       firstname: '',
       lastname: '',
+      couverture: '',
       avatar: '',
       bio: ''
     }
@@ -48,12 +45,8 @@ export default new Vuex.Store({
       state.status = status
     },
     logUser: function (state, user) {
-      instance.defaults.headers.common['Authorization'] = user.token;
       localStorage.setItem('user', JSON.stringify(user))
       state.user = user
-    },
-    userInfos: function (state, userInfos) {
-      state.userInfos = userInfos
     },
     profilInfos: function (state, profilInfos) {
       state.profilInfos = profilInfos
@@ -70,7 +63,7 @@ export default new Vuex.Store({
     register: ({commit}, userInfos) => {
       commit('setStatus', 'loading')
       return new Promise((resolve, reject) => {
-        instance.post('/auth/register', userInfos)
+        instance.post('/user/register', userInfos)
         .then(function (response) {
           resolve(response);
           commit('setStatus', 'create')
@@ -85,7 +78,7 @@ export default new Vuex.Store({
       commit('setStatus', 'loading')
       return new Promise((resolve, reject) => {
         commit;
-        instance.post('/auth/login', userInfos)
+        instance.post('/user/login', userInfos)
         .then(function (response) {
           commit('setStatus', '')
           commit('logUser', response.data)
@@ -97,19 +90,8 @@ export default new Vuex.Store({
         });
       })
     },
-    getUserInfos: ({commit}, userId) => {
-      instance.get(`/auth/${userId}`)
-      .then(function (response) {
-          commit('userInfos', response.data)
-      })
-      .catch(function (e) {
-        if(e.response.status === 401){
-          commit('logout')
-        }
-      });
-    },
-    getProfilInfos: ({commit}, userId) => {
-      instance.get(`/auth/${userId}`)
+    getProfil: ({commit}, userId) => {
+      instance.get(`/user/${userId}`)
       .then(function (response) {
           commit('profilInfos', response.data)
       })

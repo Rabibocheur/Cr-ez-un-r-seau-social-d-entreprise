@@ -28,6 +28,10 @@ module.exports = {
         allowNull: true,
         type: Sequelize.STRING
       },
+      couverture: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
       bio: {
         allowNull: true,
         type: Sequelize.STRING

@@ -117,7 +117,7 @@
           password: this.password
         }).then(function () {
           self.$store.commit('updateRoute', '/');
-          self.$router.push('/');
+          window.location.reload();
         }, function (error) {
           console.log(error);
           self.errorLog('Email et/ou mot de passe incorrect')
