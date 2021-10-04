@@ -8,7 +8,7 @@
             class="rounded-b-lg"
             width="800px"
             height="350px"
-            :src="user.couverture"
+            :src="profilInfos.couverture"
           ></v-img>
           <v-avatar
             class="profil_avatar"
@@ -16,16 +16,16 @@
             height="150"
             width="150"
           >
-            <img :src="user.avatar" />
+            <img :src="profilInfos.avatar" />
           </v-avatar>
         </v-card>
         <v-container>
           <v-row>
             <v-col cols="12" class="text-center">
-              <h1 class="mt-5">{{ user.firstname }} {{ user.lastname }}</h1>
+              <h1 class="mt-5">{{ profilInfos.firstname }} {{ profilInfos.lastname }}</h1>
             </v-col>
             <v-col cols="12" class="text-center">
-              <h3 class="font-weight-light">{{ user.bio }}</h3>
+              <h3 class="font-weight-light">{{ profilInfos.bio }}</h3>
             </v-col>
           </v-row>
         </v-container>
@@ -48,7 +48,7 @@
           <v-flex md6>
             <ToPost
               :avatar="this.$store.state.user.avatar"
-              :id="this.$store.state.user.userId"
+              :id="this.$store.state.user.id"
             />
           </v-flex>
         </v-layout>
@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import instance from "../service/instance";
 import NavBar from "../components/NavBar";
 import EditProfile from "../components/EditProfile";
 import ToPost from "../components/ToPost";
@@ -72,22 +72,26 @@ export default {
     },
   },
   data: function() {
-    return {};
+    return {
+      profilInfos: {}
+    };
   },
   mounted: function() {
-    if (this.$store.state.user.userId == -1) {
-      this.$router.push("/login");
-      this.$store.commit("updateRoute", "/login");
-      return;
-    }
-    this.$store.dispatch("getProfil", this.$route.params.userId);
+    const self = this
+    instance
+      .get(`/user/${this.$route.params.userId}`)
+      .then(function(response) {
+        self.profilInfos = response.data
+      })
+      .catch(function(e) {
+        if (e.response.status === 401) {
+          self.$store.commit("logout");
+        }
+      });
   },
   computed: {
-    ...mapState({
-      user: "profilInfos",
-    }),
     editProfil: function() {
-      if (this.$store.state.user.userId == this.$route.params.userId) {
+      if (this.$store.state.user.id == this.$route.params.userId) {
         return true;
       }
       return false;

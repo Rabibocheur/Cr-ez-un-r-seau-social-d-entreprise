@@ -9,7 +9,7 @@
 
             <v-card max-width="250">
                 <v-list>
-                    <v-list-item link route :to="'/profile/' + user.userId">
+                    <v-list-item link route :to="'/profile/' + user.id">
                         <v-list-item-avatar>
                             <img :src="avatar">
                         </v-list-item-avatar>

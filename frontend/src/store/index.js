@@ -1,41 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import router from '../router/index'
+
+import instance from '../service/instance'
 
 Vue.use(Vuex)
-
-let user = localStorage.getItem('user');
-if(!user){
-  user = {
-    userId: -1,
-    firstname: '',
-    avatar: '',
-    token: null
-  }
-}else{
-  user = JSON.parse(user);
-}
-
-const axios = require('axios');
-
-const instance = axios.create({
-  baseURL: 'http://127.0.0.1:3000/api',
-  headers: {'Authorization': 'Bearer '+ user.token}
-});
 
 export default new Vuex.Store({
   state: {
     currentRoute: window.location.pathname,
     status: '',
-    user: user,
-    profilInfos: {
-      id: '',
-      email: '',
-      firstname: '',
-      lastname: '',
-      couverture: '',
-      avatar: '',
-      bio: ''
-    }
+    user: JSON.parse(localStorage.getItem('user'))
   },
   mutations: {
     updateRoute: function (state, newRoute) {
@@ -45,18 +20,14 @@ export default new Vuex.Store({
       state.status = status
     },
     logUser: function (state, user) {
-      localStorage.setItem('user', JSON.stringify(user))
-      state.user = user
-    },
-    profilInfos: function (state, profilInfos) {
-      state.profilInfos = profilInfos
+      localStorage.setItem('user', JSON.stringify(user.user))
+      localStorage.setItem('token', JSON.stringify(user.token))
     },
     logout: function (state) {
-      state.user = {
-        userId: -1,
-        token: null
-      }
-      localStorage.removeItem('user');
+      state.currentRoute = '/login'
+      router.push('/login');
+      localStorage.clear();
+      state.user = {}
     }
   },
   actions: {
@@ -77,7 +48,6 @@ export default new Vuex.Store({
     login: ({commit}, userInfos) => {
       commit('setStatus', 'loading')
       return new Promise((resolve, reject) => {
-        commit;
         instance.post('/user/login', userInfos)
         .then(function (response) {
           commit('setStatus', '')
@@ -89,17 +59,6 @@ export default new Vuex.Store({
           reject(error);
         });
       })
-    },
-    getProfil: ({commit}, userId) => {
-      instance.get(`/user/${userId}`)
-      .then(function (response) {
-          commit('profilInfos', response.data)
-      })
-      .catch(function (e) {
-        if(e.response.status === 401){
-          commit('logout')
-        }
-      });
     }
   }
 })

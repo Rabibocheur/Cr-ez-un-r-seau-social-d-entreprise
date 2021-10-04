@@ -22,13 +22,6 @@
 
   export default {
     name: 'Posts',
-    components: { NavBar, ToPost },
-    mounted: function () {
-      if(this.$store.state.user.userId == -1){
-        this.$router.push('/login');
-        this.$store.commit('updateRoute', '/login');  
-        return ;
-      }
-    }
+    components: { NavBar, ToPost }
   }
 </script>

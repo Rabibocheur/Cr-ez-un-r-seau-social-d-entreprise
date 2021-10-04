@@ -1,9 +1,3 @@
-post http://127.0.0.1:3000/api/auth/register HTTP/1.1
+get http://127.0.0.1:3000/api/post HTTP/1.1
 content-type: application/json
-
-{
-    "firstname": "test",
-    "lastname": "test",
-    "email": "test@test.fr",
-    "password": "test"
-} 
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2MzMzNDEyNjksImV4cCI6MTYzMzM0NDg2OX0.pPtd16ZQbYwzTkeRqttN4Xli8i5w8aZ2_LjT8D4WCuU

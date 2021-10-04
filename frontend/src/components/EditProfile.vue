@@ -83,8 +83,8 @@
 </template>
 
 <script>
+import instance from "../service/instance";
 import { mapState } from "vuex";
-const axios = require("axios");
 
 export default {
   name: "EditProfile",
@@ -92,9 +92,9 @@ export default {
     return {
       dialog: false,
       body: {
-        firstname: this.$store.state.profilInfos.firstname,
-        lastname: this.$store.state.profilInfos.lastname,
-        bio: this.$store.state.profilInfos.bio,
+        firstname: this.$store.state.user.firstname,
+        lastname: this.$store.state.user.lastname,
+        bio: this.$store.state.user.bio,
       },
       urlAvatar: null,
       urlCouverture: null,
@@ -104,9 +104,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      user: "profilInfos",
-    }),
+    ...mapState(["user"]),
   },
   methods: {
     onFileAvatar: function(event) {
@@ -131,21 +129,13 @@ export default {
         formData.append("user", JSON.stringify(body));
         body = formData;
       }
-      axios
-        .put(
-          `http://127.0.0.1:3000/api/user/${this.$store.state.user.userId}`,
-          body,
-          {
-            headers: {
-              Authorization: "bearer " + this.$store.state.user.token,
-            },
-          }
-        )
-        .then((res) => {
-          if(res){
-            window.location.reload();
-          }
-        });
+      instance
+        .put(`/user/${this.$store.state.user.id}`, body)
+        .then((user) => {
+          localStorage.setItem("user", JSON.stringify(user.data));
+          window.location.reload();
+        })
+        .catch((error) => console.log(error));
     },
   },
 };

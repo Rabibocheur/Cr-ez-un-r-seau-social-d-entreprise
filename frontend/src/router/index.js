@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import VueRouteMiddleware from 'vue-route-middleware'
+import auth from './middleware/auth'
 
 Vue.use(VueRouter)
 
@@ -8,11 +10,17 @@ const routes = [
     path: '/',
     name: 'Posts',
     component: () => import('../views/Posts.vue'),
+    meta: {
+      middleware: auth
+    }
   },
   {
     path: '/profile/:userId',
     name: 'Profile',
     component: () => import('../views/Profile.vue'),
+    meta: {
+      middleware: auth
+    }
   },
   {
     path: '/signup',
@@ -30,5 +38,7 @@ const router = new VueRouter({
   mode: 'history',
   routes
 })
+
+router.beforeEach(VueRouteMiddleware());
 
 export default router

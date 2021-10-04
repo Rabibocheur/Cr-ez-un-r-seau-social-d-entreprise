@@ -1,6 +1,6 @@
 <template>
   <v-card class="pa-3">
-    <Avatar :avatar="user.avatar" :route="`/profile/${user.userId}`" class="float-left"/>
+    <Avatar :avatar="user.avatar" :route="`/profile/${user.id}`" class="float-left"/>
     <v-text-field
         class="mx-2"
         label="Que voulez vous dire ?"
