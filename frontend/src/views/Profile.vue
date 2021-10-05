@@ -22,7 +22,9 @@
         <v-container>
           <v-row>
             <v-col cols="12" class="text-center">
-              <h1 class="mt-5">{{ profilInfos.firstname }} {{ profilInfos.lastname }}</h1>
+              <h1 class="mt-5">
+                {{ profilInfos.firstname }} {{ profilInfos.lastname }}
+              </h1>
             </v-col>
             <v-col cols="12" class="text-center">
               <h3 class="font-weight-light">{{ profilInfos.bio }}</h3>
@@ -35,7 +37,7 @@
             class="mx-10 pt-4"
             justify="center"
           >
-            <EditProfile />
+            <EditProfile @reload="getProfile()"/>
             <v-btn depressed class="ml-5">
               <v-icon>mdi-cog</v-icon>
             </v-btn>
@@ -58,7 +60,7 @@
 </template>
 
 <script>
-import instance from "../service/instance";
+// import instance from "../service/instance";
 import NavBar from "../components/NavBar";
 import EditProfile from "../components/EditProfile";
 import ToPost from "../components/ToPost";
@@ -73,21 +75,11 @@ export default {
   },
   data: function() {
     return {
-      profilInfos: {}
+      profilInfos: {},
     };
   },
   mounted: function() {
-    const self = this
-    instance
-      .get(`/user/${this.$route.params.userId}`)
-      .then(function(response) {
-        self.profilInfos = response.data
-      })
-      .catch(function(e) {
-        if (e.response.status === 401) {
-          self.$store.commit("logout");
-        }
-      });
+    this.getProfile()
   },
   computed: {
     editProfil: function() {
@@ -96,6 +88,18 @@ export default {
       }
       return false;
     },
+  },
+  methods: {
+    getProfile() {
+      const self = this
+      this.$store
+        .dispatch("getApi", `/user/${this.$route.params.userId}`)
+        .then(
+          function(response) {
+            self.profilInfos = response.data
+          }
+        );
+    }
   },
 };
 </script>

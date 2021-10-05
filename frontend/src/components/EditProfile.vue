@@ -83,8 +83,7 @@
 </template>
 
 <script>
-import instance from "../service/instance";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "EditProfile",
@@ -107,6 +106,7 @@ export default {
     ...mapState(["user"]),
   },
   methods: {
+    ...mapActions(["putApi"]),
     onFileAvatar: function(event) {
       this.urlAvatar = URL.createObjectURL(event);
       this.fileAvatar = event;
@@ -129,13 +129,13 @@ export default {
         formData.append("user", JSON.stringify(body));
         body = formData;
       }
-      instance
-        .put(`/user/${this.$store.state.user.id}`, body)
+      this.putApi({path: `/user/${this.$store.state.user.id}`, body})
         .then((user) => {
           localStorage.setItem("user", JSON.stringify(user.data));
-          window.location.reload();
-        })
-        .catch((error) => console.log(error));
+          this.$store.state.user = JSON.parse(localStorage.getItem('user'))
+          this.dialog = false
+          this.$emit('reload')
+        });
     },
   },
 };

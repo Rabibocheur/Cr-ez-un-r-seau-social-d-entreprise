@@ -2,6 +2,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const models = require("../models");
 
+exports.auth = (req, res) => {
+  return res.status(200).json({'message': 'ok'})
+}
+
 exports.register = (req, res) => {
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;

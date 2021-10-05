@@ -2,8 +2,8 @@
   <div>
     <NavBar />
     <v-container fluid class="mt-10">
-      <v-layout class="mt-10 d-flex justify-center">
-        <v-flex xs10 md4>
+      <v-layout class=" mt-10 d-flex justify-center">
+        <v-flex xs10 md4 class="login">
           <v-card class="my-5 pa-5">
             <h1 v-if="currentRoute == '/signup'" class="m-auto text-center font-weight-light">Inscription</h1>
             <h1 v-else class="m-auto text-center font-weight-light">Connexion</h1>
@@ -77,6 +77,7 @@
         this.$router.push('/');
         return ;
       }
+      this.errorLog(this.$store.state.status)
     },
     computed: {
       currentRoute: function () {
@@ -108,8 +109,9 @@
           email: this.email,
           password: this.password
         }).then(function () {
+          self.$store.state.user = JSON.parse(localStorage.getItem('user'))
           self.$store.commit('updateRoute', '/');
-          window.location.reload();
+          self.$router.push('/');
         }, function (error) {
           console.log(error);
           self.errorLog('Email et/ou mot de passe incorrect')
@@ -122,3 +124,12 @@
     }
   }
 </script>
+
+<style>
+  .login{
+    width: 400px;
+    position: absolute;
+    top: 50%;
+    transform: translatey(-50%);
+  }
+</style>

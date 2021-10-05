@@ -2,7 +2,10 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import router from '../router/index'
 
-import instance from '../service/instance'
+const axios = require('axios');
+const instance = axios.create({
+  baseURL: 'http://127.0.0.1:3000/api'
+});
 
 Vue.use(Vuex)
 
@@ -24,8 +27,6 @@ export default new Vuex.Store({
       localStorage.setItem('token', JSON.stringify(user.token))
     },
     logout: function (state) {
-      state.currentRoute = '/login'
-      router.push('/login');
       localStorage.clear();
       state.user = {}
     }
@@ -57,6 +58,51 @@ export default new Vuex.Store({
         .catch(function (error) {
           commit('setStatus', 'error_login')
           reject(error);
+        });
+      })
+    },
+    logout: ({commit}, expired) => {
+      if(expired) commit('setStatus', 'Session expiré !')
+      commit('logout')
+      commit('updateRoute', '/login')
+      router.push('/login');
+    },
+    getApi: ({dispatch}, path) => {
+      return new Promise((resolve) => {
+        instance.get(path, { headers: {'Authorization': `bearer ${JSON.parse(localStorage.getItem('token'))}`} })
+        .then(function (response) {
+          resolve(response);
+        })
+        .catch(function (error) {
+          if(error.response.status === 401){
+            dispatch('logout', true)
+          }
+        });
+      })
+    },
+    postApi: ({dispatch}, {path, body}) => {
+      return new Promise((resolve) => {
+        instance.post(path, body, { headers: {'Authorization': `bearer ${JSON.parse(localStorage.getItem('token'))}`} })
+        .then(function (response) {
+          resolve(response);
+        })
+        .catch(function (error) {
+          if(error.response.status === 401){
+            dispatch('logout', true)
+          }
+        });
+      })
+    },
+    putApi: ({dispatch}, {path, body}) => {
+      return new Promise((resolve) => {
+        instance.put(path, body, { headers: {'Authorization': `bearer ${JSON.parse(localStorage.getItem('token'))}`} })
+        .then(function (response) {
+          resolve(response);
+        })
+        .catch(function (error) {
+          if(error.response.status === 401){
+            dispatch('logout', true)
+          }
         });
       })
     }
