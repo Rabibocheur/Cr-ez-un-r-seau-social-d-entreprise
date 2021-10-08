@@ -1,16 +1,9 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const models = require("../models");
-
-exports.auth = (req, res) => {
-  return res.status(200).json({'message': 'ok'})
-}
+const { User, Post, Comment } = require("../models");
 
 exports.register = (req, res) => {
-  const firstname = req.body.firstname;
-  const lastname = req.body.lastname;
-  const email = req.body.email;
-  const password = req.body.password;
+  const { firstname, lastname, email, password } = req.body;
 
   const EMAIL_REGEX =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -30,65 +23,44 @@ exports.register = (req, res) => {
   }
 
   if (!PASSWORD_REGEX.test(password)) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "password invalid (must length 4 - 8 and include 1 number at least)",
-      });
+    return res.status(400).json({
+      error:
+        "password invalid (must length 4 - 8 and include 1 number at least)",
+    });
   }
 
-  models.User.findOne({
-    attributes: ["email"],
-    where: { email: email },
-  })
+  User.findOne({ where: { email } })
     .then((user) => {
       if (!user) {
         bcrypt
           .hash(password, 10)
           .then((bcryptedPassword) => {
-            models.User.create({
-              firstname: firstname,
-              lastname: lastname,
-              email: email,
+            User.create({
+              firstname,
+              lastname,
+              email,
               password: bcryptedPassword,
-              avatar: "http://127.0.0.1:3000/images/pngegg.png",
-              couverture: "http://127.0.0.1:3000/images/couverture.jpg",
-              bio: "",
               isAdmin: 0,
             })
-              .then((newUser) => {
-                return res.status(201).json({
-                  userId: newUser.id,
-                });
-              })
-              .catch((error) => {
-                return res
-                  .status(500)
-                  .json({ error, error: "cannot add user" });
-              });
+            .then((newUser) => {
+              res.status(201).json(newUser);
+            })
+            .catch(() => res.status(500).json({ error: "cannot add user" }));
           })
           .catch((error) => res.status(500).json({ error }));
-      } else {
-        return res.status(400).json({ error: "email already exist" });
-      }
+      } else return res.status(400).json({ error: "email already exist" });
     })
-    .catch((error) => {
-      return res.status(500).json({ error, error: "unable to verify user" });
-    });
+    .catch(() => res.status(500).json({ error: "unable to verify user" }));
 };
 
 exports.login = (req, res) => {
-  let email = req.body.email;
-  let password = req.body.password;
+  const { email, password } = req.body;
 
   if (email == null || password == null) {
     return res.status(400).json({ error: "missing parameters" });
   }
 
-  models.User.findOne({
-    where: { email: email },
-  })
+  User.findOne({ where: { email } })
     .then((user) => {
       if (user) {
         bcrypt
@@ -96,20 +68,13 @@ exports.login = (req, res) => {
           .then((valid) => {
             if (!valid) {
               return res
-                .status(401)
+                .status(400)
                 .json({ error: "Mot de passe incorrect !" });
             }
             res.status(200).json({
-              user: {
-                id: user.id,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                bio: user.bio,
-                avatar: user.avatar,
-                couverture: user.couverture,
-              },
+              user,
               token: jwt.sign(
-                { userId: user.id, isAdmin: user.isAdmin },
+                { userUuid: user.uuid, isAdmin: user.isAdmin },
                 "SECRET_TOKEN",
                 {
                   expiresIn: "1h",
@@ -118,44 +83,41 @@ exports.login = (req, res) => {
             });
           })
           .catch((error) => res.status(500).json({ error }));
-      } else {
-        return res.status(400).json({ error: "user not exist" });
-      }
+      } else return res.status(400).json({ error: "user not exist" });
     })
-    .catch((error) => {
-      return res.status(500).json({ error, error: "unable to verify user" });
-    });
+    .catch(() => res.status(500).json({ error: "unable to verify user" }));
 };
 
 exports.getUserProfile = (req, res) => {
-  models.User.findOne({
-    attributes: [
-      "id",
-      "email",
-      "firstname",
-      "lastname",
-      "avatar",
-      "couverture",
-      "bio",
-    ],
-    where: { id: req.params.userId },
+  User.findOne({ 
+    where: { uuid: req.params.uuid },
+    include: [{
+      model: Post,
+      as: 'posts',
+      include: [{
+        model: User,
+        as: 'user'
+      },{
+        model: Comment,
+        as: 'comments',
+        include: 'user'
+      }]
+    }],
+    order: [
+      ['posts', 'createdAt', 'DESC']
+    ]
   })
-    .then(function (user) {
-      if (user) {
-        res.status(201).json(user);
-      } else {
-        res.status(404).json({ error: "user not found" });
-      }
+    .then((user) => {
+      if (user) return res.status(201).json(user);
+      else return res.status(404).json({ error: "user not found" });
     })
-    .catch(function (err) {
-      res.status(500).json({ error: "cannot fetch user" });
-    });
+    .catch(() => res.status(500).json({ error: "cannot fetch user" }));
 };
 
 exports.modifyProfile = (req, res) => {
-  const userId = req.token.userId;
+  const userUuid = req.token.userUuid;
 
-  if (userId < 0 || userId != req.params.userId)
+  if (userUuid < 0 || userUuid != req.params.uuid)
     return res.status(400).json({ error: "wrong token" });
 
   let editUser = { ...req.body };
@@ -176,9 +138,8 @@ exports.modifyProfile = (req, res) => {
     };
   }
 
-  models.User.findOne({
-    attributes: ["id", "firstname", "lastname", "avatar", "couverture", "bio"],
-    where: { id: userId },
+  User.findOne({
+    where: { uuid: userUuid },
   })
     .then((user) => {
       user
@@ -194,7 +155,5 @@ exports.modifyProfile = (req, res) => {
           res.status(500).json({ error, error: "cannot update user" });
         });
     })
-    .catch((error) => {
-      return res.status(500).json({ error, error: "unable to verify user" });
-    });
+    .catch(() => res.status(500).json({ error: "unable to verify user" }));
 };

@@ -1,14 +1,14 @@
 <template>
-    <router-link :to="route">
-    <v-list-item-avatar>
-        <img :src="avatar">
-    </v-list-item-avatar>
+    <router-link :to="`/profile/${uuid}`">
+        <v-avatar :size="size">
+            <img :src="avatar">
+        </v-avatar>
     </router-link>
 </template>
 
 <script>
 export default {
     name: 'Avatar',
-    props: ['avatar', 'route']
+    props: ['avatar', 'uuid', 'size']
 }
 </script>

@@ -1,7 +1,7 @@
 const models = require("../models");
 
 exports.toPost = (req, res) => {
-  const userId = req.token.userId;
+  const userUuid = req.token.userUuid;
 
   const postObject = req.file
     ? {
@@ -13,43 +13,68 @@ exports.toPost = (req, res) => {
     : { ...req.body };
 
   models.User.findOne({
-    where: { id: userId },
+    where: { uuid: userUuid },
   })
-    .then(function (userFound) {
-      models.Message.create({
+    .then((userFound) => {
+      models.Post.create({
         title: postObject.title,
-        content: postObject.content,
-        likes: 0,
-        UserId: userFound.id,
+        content: req.file ? postObject.content : "",
+        userId: userFound.id,
       })
-        .then(function (newMessage) {
-          return res.status(201).json(newMessage);
-        })
+        .then((newPost) => res.status(201).json(newPost))
         .catch((error) => res.status(500).json({ error }));
     })
-    .catch(function () {
-      return res.status(500).json({ 'error': "unable to verify user" });
-    });
+    .catch(() => res.status(500).json({ error: "unable to verify user" }));
 };
 
 exports.getAllPosts = (req, res) => {
-  models.Message.findAll({
-    attributes: ["id", "UserId", "title", "content"],
+  models.Post.findAll({
     include: [
       {
         model: models.User,
-        attributes: ["firstname", "avatar"],
+        as: "user",
+      },
+      {
+        model: models.Comment,
+        as: "comments",
+        include: [{ model: models.User, as: "user" }],
       },
     ],
+    order: [["createdAt", "DESC"]],
   })
-    .then(function (messages) {
-      if (messages) {
-        res.status(200).json(messages);
+    .then(function (posts) {
+      if (posts) {
+        res.status(200).json(posts);
       } else {
-        res.status(404).json({ 'error': "no messages found" });
+        res.status(404).json({ error: "no messages found" });
       }
     })
     .catch(function () {
-      res.status(500).json({ 'error': "invalid fields" });
+      res.status(500).json({ error: "invalid fields" });
     });
+};
+
+exports.createComment = (req, res) => {
+  const userUuid = req.token.userUuid;
+
+  models.User.findOne({
+    where: { uuid: userUuid },
+  })
+    .then((userFound) => {
+      models.Comment.create({
+        userUuid: userFound.uuid,
+        userId: userFound.id,
+        postId: req.params.postId,
+        content: req.body.content,
+      })
+        .then((newComment) => {
+          models.Comment.findOne({
+            where: { id: newComment.id },
+            include: 'user',
+          }).then((comment) => res.status(200).json(comment))
+          .catch((error) => res.status(500).json({ error }));
+        })
+        .catch((error) => res.status(500).json({ error }));
+    })
+    .catch(() => res.status(500).json({ error: "unable to verify user" }));
 };

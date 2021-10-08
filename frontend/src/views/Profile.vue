@@ -10,12 +10,7 @@
             height="350px"
             :src="profilInfos.couverture"
           ></v-img>
-          <v-avatar
-            class="profil_avatar"
-            color="indigo"
-            height="150"
-            width="150"
-          >
+          <v-avatar class="profil_avatar" height="150" width="150">
             <img :src="profilInfos.avatar" />
           </v-avatar>
         </v-card>
@@ -37,7 +32,7 @@
             class="mx-10 pt-4"
             justify="center"
           >
-            <EditProfile @reload="getProfile()"/>
+            <EditProfile @reload="getProfile()" />
             <v-btn depressed class="ml-5">
               <v-icon>mdi-cog</v-icon>
             </v-btn>
@@ -46,13 +41,19 @@
       </v-layout>
       <v-divider></v-divider>
       <v-container>
-        <v-layout row class="ma-5 justify-center">
-          <v-flex md6>
-            <ToPost
-              :avatar="this.$store.state.user.avatar"
-              :id="this.$store.state.user.id"
-            />
-          </v-flex>
+        <v-layout justify-center class="my-10">
+          <v-row style="max-width: 600px">
+            <v-col cols="12">
+              <ToPost @reloadPosts="getProfile()" />
+            </v-col>
+          </v-row>
+        </v-layout>
+        <v-layout justify-center>
+          <v-row style="max-width: 600px">
+            <v-col cols="12" v-for="post in posts" :key="post.id">
+              <Post :post="post" />
+            </v-col>
+          </v-row>
         </v-layout>
       </v-container>
     </v-main>
@@ -60,14 +61,15 @@
 </template>
 
 <script>
-// import instance from "../service/instance";
+import { mapActions } from "vuex";
 import NavBar from "../components/NavBar";
 import EditProfile from "../components/EditProfile";
 import ToPost from "../components/ToPost";
+import Post from "../components/Post";
 
 export default {
   name: "Posts",
-  components: { NavBar, EditProfile, ToPost },
+  components: { NavBar, EditProfile, ToPost, Post },
   watch: {
     $route() {
       window.location.reload();
@@ -76,30 +78,30 @@ export default {
   data: function() {
     return {
       profilInfos: {},
+      posts: [],
     };
   },
   mounted: function() {
-    this.getProfile()
+    this.getProfile();
   },
   computed: {
     editProfil: function() {
-      if (this.$store.state.user.id == this.$route.params.userId) {
+      if (this.$store.state.user.uuid == this.$route.params.uuid) {
         return true;
       }
       return false;
     },
   },
   methods: {
-    getProfile() {
-      const self = this
-      this.$store
-        .dispatch("getApi", `/user/${this.$route.params.userId}`)
-        .then(
-          function(response) {
-            self.profilInfos = response.data
-          }
-        );
-    }
+    ...mapActions(["getApi"]),
+    getProfile: function() {
+      const self = this;
+      this.getApi(`/user/${this.$route.params.uuid}`)
+      .then(function(response) {
+        self.profilInfos = response.data;
+        self.posts = response.data.posts;
+      });
+    },
   },
 };
 </script>

@@ -15,7 +15,10 @@ export default {
 </script>
 
 <style>
-  #app {
+  #app, body {
     background-color: #F0F2F5;
+  }
+  a{
+    text-decoration: none;
   }
 </style>

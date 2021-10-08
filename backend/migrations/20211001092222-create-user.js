@@ -1,56 +1,63 @@
 'use strict';
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Users', {
+  up: async (queryInterface, DataTypes) => {
+    await queryInterface.createTable('users', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
+      },
+      uuid: {
+        allowNull: false,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
       },
       firstname: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       lastname: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       email: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       password: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       avatar: {
-        allowNull: true,
-        type: Sequelize.STRING
+        allowNull: false,
+        type: DataTypes.STRING,
+        defaultValue: "http://127.0.0.1:3000/images/pngegg.png",
       },
       couverture: {
-        allowNull: true,
-        type: Sequelize.STRING
+        allowNull: false,
+        type: DataTypes.STRING,
+        defaultValue: "http://127.0.0.1:3000/images/couverture.jpg",
       },
       bio: {
         allowNull: true,
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       isAdmin: {
         allowNull: false,
-        type: Sequelize.BOOLEAN
+        type: DataTypes.BOOLEAN
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       }
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('users');
   }
 };

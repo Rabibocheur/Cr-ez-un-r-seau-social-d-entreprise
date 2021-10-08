@@ -1,21 +1,34 @@
 <template>
-  <v-card class="my-5 pa-1">
-    <v-card-title class="mb-1 pa-1">
-      <v-avatar size="36">
-        <img alt="user" :src="avatar" />
-      </v-avatar>
+  <v-card class="mt-2 pa-1">
+    <v-card-title class="mx-3 my-1 pa-0">
+      <Avatar :avatar="post.user.avatar" :uuid="post.user.uuid" size="36" />
       <v-layout column class="ml-3">
-        <span class="text-body-2 black--text">{{ firstname }}</span>
-        <span class="text-caption grey--text text--darken-2">Aperçu</span>
+        <router-link
+        :to="`/profile/${post.user.uuid}`"
+        class="text-body-2 font-weight-medium black--text">
+          {{ `${post.user.firstname} ${post.user.lastname}` }}
+        </router-link>
+        <span class="text-caption grey--text text--darken-2">
+          {{
+            moment(post.createdAt)
+              .locale("fr")
+              .fromNow()
+          }}
+        </span>
       </v-layout>
-      <v-icon large>
-        mdi-dots-horizontal
-      </v-icon>
+      <v-btn fab small depressed color="white">
+          <v-icon>
+            mdi-dots-horizontal
+          </v-icon>
+        </v-btn>
     </v-card-title>
-    <v-card-text class="pa-2 font-weight-regular title black--text">
-      {{ title }}
+    <v-card-text class="mx-3 my-1 pa-0 font-weight-regular title black--text">
+      {{ post.title }}
     </v-card-text>
-    <v-img v-if="content != null" height="200px" :src="content"></v-img>
+    <v-img
+      v-if="post.content != ''"
+      :src="post.content"
+    ></v-img>
     <v-divider></v-divider>
     <v-layout
       justify-space-between
@@ -33,28 +46,33 @@
         <span class="subheading">commentaires</span>
       </div>
     </v-layout>
-    <v-card-actions>
-      <v-layout justify-space-around>
-        <v-btn depressed class="white">
-          <v-icon class="mr-1">
-            mdi-thumb-up-outline
-          </v-icon>
-          <span class="mr-2">J'aime</span>
-        </v-btn>
-        <v-btn depressed class="white">
-          <v-icon class="mr-1">
-            mdi-message-outline
-          </v-icon>
-          <span>Commenter</span>
-        </v-btn>
-      </v-layout>
-    </v-card-actions>
+    <ToComment
+      :postId="post.id"
+      :comments="post.comments"
+    />
   </v-card>
 </template>
 
 <script>
+import Avatar from "./Avatar";
+import ToComment from "./ToComment";
+
+const moment = require("moment");
+
 export default {
-    name: 'Post',
-    props: ['avatar', 'firstname', 'title', 'content']
-}
+  name: "Post",
+  components: { Avatar, ToComment },
+  props: ['post'],
+  data: () => {
+    return {
+      moment: moment
+    };
+  }
+};
 </script>
+
+<style scoped>
+  .v-card {
+    overflow-wrap: anywhere;
+  }
+</style>

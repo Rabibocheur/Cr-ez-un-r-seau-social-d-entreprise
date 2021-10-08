@@ -5,10 +5,9 @@ const auth = require("../middleware/auth");
 const multer = require("../middleware/multer-config");
 const user = require("../controllers/user");
 
-router.get("/auth", auth, user.auth)
 router.post("/register", user.register);
 router.post("/login", user.login);
-router.get("/:userId", auth, user.getUserProfile);
-router.put("/:userId", auth, multer.fields([{name: 'avatar'}, {name: 'couverture'}]), user.modifyProfile);
+router.get("/:uuid", auth, user.getUserProfile);
+router.put("/:uuid", auth, multer.fields([{name: 'avatar'}, {name: 'couverture'}]), user.modifyProfile);
 
 module.exports = router;

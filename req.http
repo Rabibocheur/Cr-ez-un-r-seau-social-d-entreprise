@@ -1,3 +1,7 @@
-get http://127.0.0.1:3000/api/post HTTP/1.1
+get http://127.0.0.1:3000/api/user/b394be64-1a18-4336-b30a-678590f7ac2e HTTP/1.1
 content-type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2MzMzNDEyNjksImV4cCI6MTYzMzM0NDg2OX0.pPtd16ZQbYwzTkeRqttN4Xli8i5w8aZ2_LjT8D4WCuU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVXVpZCI6ImIzOTRiZTY0LTFhMTgtNDMzNi1iMzBhLTY3ODU5MGY3YWMyZSIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2MzM2MzIxMjgsImV4cCI6MTYzMzYzNTcyOH0.KnJPOYWNnj76BzfZ61XGvhjrXFAU9pXTiVDAri7YYLo
+
+{
+    "content": "bob@test.lkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkfr"
+}

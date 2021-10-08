@@ -30,7 +30,6 @@
             <v-col cols="12" md="4">
               <v-avatar
                 class="profil_avatar"
-                color="indigo"
                 height="150"
                 width="150"
               >
@@ -129,7 +128,7 @@ export default {
         formData.append("user", JSON.stringify(body));
         body = formData;
       }
-      this.putApi({path: `/user/${this.$store.state.user.id}`, body})
+      this.putApi({path: `/user/${this.$store.state.user.uuid}`, body})
         .then((user) => {
           localStorage.setItem("user", JSON.stringify(user.data));
           this.$store.state.user = JSON.parse(localStorage.getItem('user'))
