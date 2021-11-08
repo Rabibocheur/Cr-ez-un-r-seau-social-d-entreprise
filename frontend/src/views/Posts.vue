@@ -1,53 +1,75 @@
 <template>
-  <div>
-    <NavBar />
-    <v-main>
-      <v-container>
-        <v-layout justify-center class="my-10">
-          <v-row style="max-width: 600px">
-            <v-col cols="12">
-              <ToPost
-                @reloadPosts="getPosts()"
-              />
-            </v-col>
-          </v-row>
-        </v-layout>
-        <v-layout justify-center>
-          <v-row style="max-width: 600px">
-            <v-col cols="12" v-for="post in posts" :key="post.id">
-              <Post :post="post" />
-            </v-col>
-          </v-row>
-        </v-layout>
-      </v-container>
-    </v-main>
-  </div>
+  <v-container id="test" class="mt-5">
+    <v-layout justify-center>
+      <v-row style="max-width: 600px">
+        <v-col cols="12" class="pa-1">
+          <ToPost @newPost="pushNewPost" />
+        </v-col>
+        <v-col cols="12" class="pa-1" v-for="post in posts" :key="post.id">
+          <Post
+            :post="post"
+            @changePost="updatePost"
+            @deletePost="deletePost"
+          />
+        </v-col>
+        <v-progress-circular
+          :size="100"
+          :width="7"
+          color="purple"
+          indeterminate
+          class="loading"
+        ></v-progress-circular>
+      </v-row>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
-import { mapActions } from "vuex";
-import NavBar from "../components/NavBar";
+import { apiClient } from '../services/ApiClient'
 import ToPost from "../components/ToPost";
 import Post from "../components/Post";
 
 export default {
   name: "Posts",
-  components: { NavBar, ToPost, Post },
-  data: function () {
+  components: { ToPost, Post },
+  data: function() {
     return {
-      posts: []
-    }
+      posts: [],
+    };
   },
   mounted() {
     this.getPosts();
   },
   methods: {
-    ...mapActions(["getApi"]),
-    getPosts: function() {
-      this.getApi(`/post`).then((response) => {
-        this.posts = response.data
+    getPosts() {
+      apiClient.get(`/post`).then((response) => {
+        this.posts = response.data;
+      });
+    },
+    pushNewPost(post) {
+      this.posts.unshift(post);
+    },
+    deletePost(postId) {
+      this.posts.forEach((post, index) => {
+        if (post.id === postId) this.posts.splice(index, 1);
+      });
+    },
+    updatePost(newPost) {
+      this.posts.forEach((post, index) => {
+        if (post.id === newPost.id) this.posts.splice(index, 1, newPost);
       });
     },
   },
 };
 </script>
+
+<style lang="scss">
+.loading {
+  margin-top: 100px;
+  margin-bottom: 200px;
+  z-index: 100;
+  position: relative;
+  left: 50%;
+  transform: translatex(-50%);
+}
+</style>

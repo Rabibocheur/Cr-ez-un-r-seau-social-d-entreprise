@@ -1,123 +1,98 @@
 <template>
-  <div>
-    <v-card class="pa-3">
-      <v-layout class="d-flex">
+  <div class="mb-6">
+    <v-card class="pa-1 rounded-lg" elevation="1">
+      <v-layout class="d-flex mx-3 my-1">
         <Avatar
           :avatar="user.avatar"
           :uuid="user.uuid"
-          size="50"
+          size="38"
           class="float-left"
         />
-        <v-textarea
-          v-model="title"
-          label="Que voulez vous dire ?"
-          auto-grow
-          outlined
-          rows="1"
-          row-height="15"
-          color="red"
-          class="mx-2"
-        ></v-textarea>
+        <div @click="openPostDialog" class="to_post mx-2">
+          Ecrivez quelque chose...
+        </div>
       </v-layout>
-      <div class="d-flex justify-space-around">
-        <v-btn
-          :disabled="isAddButtonDisabled"
-          class="red accent-2 white--text"
-          depressed
-          @click="createPost()"
-        >
-          <v-icon left>mdi-send</v-icon>
-          <span>Publier</span>
-        </v-btn>
-        <v-btn
-          depressed
-          class="light-blue darken-1 white--text"
-          @click="takeContent()"
-        >
-          <v-icon left>mdi-image</v-icon>
-          <span>image/gif</span>
-          <v-file-input
-            ref="file"
-            style="visibility: hidden; width: 0"
-            label="File input"
-            hide-input
-            @change="onFileContent"
-          ></v-file-input>
-        </v-btn>
-      </div>
+      <v-divider class="my-2"></v-divider>
+      <v-btn
+        style="width: 100%"
+        depressed
+        class="transparent darken-1 gray--text"
+        @click="takeContent()"
+      >
+        <v-icon left>mdi-image</v-icon>
+        <span>image / gif</span>
+      </v-btn>
+      <v-file-input
+        ref="file"
+        style="visibility: hidden; width: 0; position: absolute"
+        label="File input"
+        hide-input
+        multiple
+        @change="onFileContent"
+      ></v-file-input>
     </v-card>
-
-    <v-card  v-if="title != '' || urlContent != ''" class="mt-2 pa-1">
-      <v-card-title class="mx-3 my-1 pa-0">
-        <Avatar :avatar="user.avatar" :uuid="user.uuid" size="36" />
-        <v-layout column class="ml-3">
-          <span class="text-body-2 font-weight-medium black--text">
-            {{ `${user.firstname} ${user.lastname}` }}
-          </span>
-          <span class="text-caption grey--text text--darken-2">
-            Aperçu du post
-          </span>
-        </v-layout>
-      </v-card-title>
-      <v-card-text class="mx-3 my-1 pa-0 font-weight-regular title black--text">
-        {{ title }}
-      </v-card-text>
-      <v-img v-if="urlContent != ''" :src="urlContent"></v-img>
-    </v-card>
+    <PostForm @sendPost="createPost" titleForm="Créer une publication" />
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { apiClient } from "../services/ApiClient";
+import { mapState, mapMutations } from "vuex";
+import { bus } from "../main";
 import Avatar from "./Avatar";
+import PostForm from "./PostForm";
 
 export default {
   name: "ToPost",
-  components: { Avatar },
-  data: function() {
-    return {
-      title: "",
-      urlContent: "",
-      fileContent: null,
-      isFormData: false,
-    };
-  },
+  components: { Avatar, PostForm },
   computed: {
     ...mapState(["user"]),
-    isAddButtonDisabled: function() {
-      return !(this.title || this.urlContent);
-    },
   },
   methods: {
-    ...mapActions(["postApi"]),
+    ...mapMutations(["SET_DIALOG"]),
+    openPostDialog() {
+      this.SET_DIALOG(true);
+    },
     takeContent: function() {
       this.$refs.file.$children[0].$el.click();
     },
-    onFileContent: function(event) {
-      this.urlContent = URL.createObjectURL(event);
-      this.fileContent = event;
-      this.isFormData = true;
+    onFileContent(event) {
+      bus.$emit("addFiles", event);
+      this.openPostDialog();
     },
-    createPost: function() {
+    createPost(payload) {
       let body = {
-        title: this.title,
-        content: "",
+        title: payload.title,
+        content: payload.filesContent,
       };
 
-      if (this.isFormData) {
+      if (payload.isFormData) {
         let formData = new FormData();
-        formData.append("content", this.fileContent);
-        formData.append("title", this.title);
+        formData.append("title", payload.title);
+        for (const i of Object.keys(payload.filesContent)) {
+          formData.append("content", payload.filesContent[i]);
+        }
         body = formData;
       }
 
-      this.title = "";
-      this.urlContent = "";
-
-      this.postApi({ path: `/post`, body }).then(() => {
-        this.$emit("reloadPosts");
+      apiClient.post(`/post`, body).then((newPost) => {
+        this.$emit("newPost", newPost.data);
       });
     },
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.to_post {
+  padding: 7px 15px;
+  color: rgba(0, 0, 0, 0.38);
+  background-color: #f0efef;
+  border-radius: 30px;
+  width: 100%;
+  cursor: pointer;
+  &:hover {
+    background-color: #e2e1e1;
+  }
+}
+</style>

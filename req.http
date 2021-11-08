@@ -1,7 +1,8 @@
-get http://127.0.0.1:3000/api/user/b394be64-1a18-4336-b30a-678590f7ac2e HTTP/1.1
+post http://127.0.0.1:3000/api/post/1/like HTTP/1.1
 content-type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVXVpZCI6ImIzOTRiZTY0LTFhMTgtNDMzNi1iMzBhLTY3ODU5MGY3YWMyZSIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2MzM2MzIxMjgsImV4cCI6MTYzMzYzNTcyOH0.KnJPOYWNnj76BzfZ61XGvhjrXFAU9pXTiVDAri7YYLo
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVXVpZCI6ImIzOTRiZTY0LTFhMTgtNDMzNi1iMzBhLTY3ODU5MGY3YWMyZSIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2MzQxNTIyNzcsImV4cCI6MTYzNDE1NTg3N30.2tnK7xaakqIJPWXsfc36giwaZTuCRyGb-hCHYyi5vnc
 
 {
-    "content": "bob@test.lkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkfr"
+    "title": "ok",
+    "content": ""
 }

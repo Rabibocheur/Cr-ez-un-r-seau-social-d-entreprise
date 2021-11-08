@@ -15,7 +15,7 @@
           <v-row>
             <v-col cols="12" md="8">
               <v-img
-                class="rounded-b-lg"
+                class="red lighten-5 rounded-b-lg"
                 width="500px"
                 height="200px"
                 :src="urlCouverture || user.couverture"
@@ -33,7 +33,7 @@
                 height="150"
                 width="150"
               >
-                <img :src="urlAvatar || user.avatar" />
+                <img :src="urlAvatar || user.avatar || '../avatar.png'" />
               </v-avatar>
               <v-file-input
                 label="File input"
@@ -82,7 +82,8 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { apiClient } from '../services/ApiClient'
+import { mapState } from "vuex";
 
 export default {
   name: "EditProfile",
@@ -105,7 +106,6 @@ export default {
     ...mapState(["user"]),
   },
   methods: {
-    ...mapActions(["putApi"]),
     onFileAvatar: function(event) {
       this.urlAvatar = URL.createObjectURL(event);
       this.fileAvatar = event;
@@ -118,6 +118,7 @@ export default {
     },
     editedProfile: function() {
       let body = this.body;
+
       if (this.isFormData) {
         let formData = new FormData();
         formData.append("avatar", this.fileAvatar || this.user.avatar);
@@ -128,7 +129,8 @@ export default {
         formData.append("user", JSON.stringify(body));
         body = formData;
       }
-      this.putApi({path: `/user/${this.$store.state.user.uuid}`, body})
+      
+      apiClient.put(`/user/${this.$store.state.user.uuid}`, body)
         .then((user) => {
           localStorage.setItem("user", JSON.stringify(user.data));
           this.$store.state.user = JSON.parse(localStorage.getItem('user'))

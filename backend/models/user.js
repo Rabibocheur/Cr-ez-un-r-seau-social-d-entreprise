@@ -32,21 +32,28 @@ module.exports = (sequelize, DataTypes) => {
     },
     email: {
       allowNull: false,
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      unique: true,
+      validate: {
+        notNull: true,
+        is: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      }
     },
     password: {
       allowNull: false,
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      validate: {
+        notNull: true,
+        is: /^(?=.*\d).{4,8}$/
+      }
     },
     avatar: {
       allowNull: false,
-      type: DataTypes.STRING,
-      defaultValue: "http://127.0.0.1:3000/images/pngegg.png",
+      type: DataTypes.STRING
     },
     couverture: {
       allowNull: false,
-      type: DataTypes.STRING,
-      defaultValue: "http://127.0.0.1:3000/images/couverture.jpg",
+      type: DataTypes.STRING
     },
     bio: {
       allowNull: true,

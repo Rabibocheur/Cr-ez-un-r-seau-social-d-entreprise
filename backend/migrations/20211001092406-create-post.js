@@ -18,7 +18,12 @@ module.exports = {
       },
       content: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(1000)
+      },
+      likes: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        defaultValue: 0
       },
       createdAt: {
         allowNull: false,

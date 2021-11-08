@@ -11,31 +11,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ User, Post }) {
       this.belongsTo(User, { foreignKey: 'userId', as: 'user' })
-      this.belongsTo(User, { foreignKey: 'postId', as: 'post' })
+      this.belongsTo(Post, { foreignKey: 'postId', as: 'post' })
     }
   };
   Comment.init({
-    userUuid: {
-      allowNull: false,
-      type: DataTypes.UUID,
-    },
     content: {
       allowNull: false,
       type: DataTypes.STRING
     },
     createdAt: {
       allowNull: false,
-      type: DataTypes.DATE,
-      get() {
-        return moment(this.getDataValue('createdAt')).format('YYYY/MM/DD h:mm:ss');
-      }
+      type: DataTypes.DATE
     },
     updatedAt: {
       allowNull: false,
-      type: DataTypes.DATE,
-      get() {
-        return moment(this.getDataValue('updatedAt')).format('YYYY/MM/DD h:mm:ss');
-      }
+      type: DataTypes.DATE
     }
   }, {
     sequelize,

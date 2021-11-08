@@ -33,9 +33,11 @@
               <v-text-field
                 style="height: 60px"
                 v-model="body.password"
+                :rules="passwordRules"
+                :type="show ? 'text' : 'password'"
+                :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append="show = !show"
                 label="Mot de passe"
-                type="password"
-                color="green"
                 outlined
                 dense
               ></v-text-field>
@@ -65,97 +67,68 @@
         </v-flex>
       </v-col>
     </v-row>
-
-    <v-snackbar v-model="snackbarError">
-      {{ status }}
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          color="primary"
-          text
-          v-bind="attrs"
-          @click="snackbarError = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
+    <SnackBar />
   </v-container>
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations } from "vuex";
+import { apiClient } from '../services/ApiClient'
+import { mapState, mapMutations } from "vuex";
 import Registration from "../components/Registration";
+import SnackBar from "../components/SnackBar";
 
 export default {
   name: "Login",
-  components: { Registration },
+  components: { Registration, SnackBar },
   data: () => {
     return {
       valid: true,
+      show: false,
       body: {
         email: "",
         password: "",
       },
       emailRules: [
-        (v) => !!v || "E-mail is required",
-        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+        (v) => !!v || "Veuillez renseignez votre e-mail",
+        (v) => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || "E-mail non valide",
       ],
-      snackbarError: false
+      passwordRules: [
+        (v) => !!v || "Veuillez renseignez votre mot de passe"
+      ]
     };
   },
-  mounted() {
-    this.snackbarError = true;
-  },
   computed: {
-    ...mapState(["status"]),
+    ...mapState(["status", "snackbar"]),
   },
   methods: {
-    ...mapActions(["postApi"]),
-    ...mapMutations(["setStatus", "logUser"]),
+    ...mapMutations(["SET_STATUS", "LOG_USER", "SET_SNACKBAR"]),
     validate() {
       const validate = this.$refs.form.validate();
       if (validate) this.login();
     },
     loginAfterRegist(payload) {
-      this.email = payload.email;
-      this.password = payload.password;
+      this.body.email = payload.email;
+      this.body.password = payload.password;
       this.login();
     },
     login() {
-      this.setStatus("loading");
+      this.SET_STATUS("loading");
       const body = this.body;
-      this.postApi({ path: "/user/login", body })
-      .then((user) => {
-        console.log(user)
-        this.setStatus("");
-      }).catch((e) => {
-        console.log('error', e)
-        this.setStatus("Email et/ou mot de passe incorrect");
-        this.snackbarError = true;
-      })
-
-      // const self = this;
-      // this.$store
-      //   .dispatch("login", {
-      //     email: this.email,
-      //     password: this.password,
-      //   })
-      //   .then(
-      //     () => {
-      //       self.$store.state.user = JSON.parse(localStorage.getItem("user"));
-      //       self.$router.push("/");
-      //     },
-      //     (error) => {
-      //       console.log(error);
-      //       self.errorLog("Email et/ou mot de passe incorrect");
-      //     }
-      //   );
-    }
+      apiClient.post("/user/login", body)
+        .then((user) => {
+          this.LOG_USER(user.data);
+          this.SET_STATUS("");
+        })
+        .catch(() => {
+          this.SET_STATUS("Email et/ou mot de passe incorrect");
+          this.SET_SNACKBAR(true);
+        });
+    },
   },
 };
 </script>
 
-<style>
+<style scoped>
 .login {
   width: 400px;
   position: absolute;

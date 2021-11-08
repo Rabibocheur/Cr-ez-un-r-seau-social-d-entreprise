@@ -26,21 +26,20 @@ module.exports = (sequelize, DataTypes) => {
     },
     content: {
       allowNull: false,
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(1000)
+    },
+    likes: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     },
     createdAt: {
       allowNull: false,
-      type: DataTypes.DATE,
-      get() {
-        return moment(this.getDataValue('createdAt')).format('YYYY/MM/DD h:mm:ss');
-      }
+      type: DataTypes.DATE
     },
     updatedAt: {
       allowNull: false,
-      type: DataTypes.DATE,
-      get() {
-        return moment(this.getDataValue('updatedAt')).format('YYYY/MM/DD h:mm:ss');
-      }
+      type: DataTypes.DATE
     }
   }, {
     sequelize,

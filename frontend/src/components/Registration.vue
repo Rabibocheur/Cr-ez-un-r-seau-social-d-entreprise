@@ -32,8 +32,8 @@
               <v-col cols="12" md="6">
                 <v-text-field
                   style="height: 40px"
-                  :counter="10"
                   v-model="body.firstname"
+                  :rules="firstnameRules"
                   label="Prenom"
                   required
                   outlined
@@ -43,8 +43,8 @@
               <v-col cols="12" md="6">
                 <v-text-field
                   style="height: 40px"
-                  :counter="10"
                   v-model="body.lastname"
+                  :rules="lastnameRules"
                   label="Nom"
                   required
                   outlined
@@ -56,7 +56,7 @@
                   style="height: 40px"
                   v-model="body.email"
                   :rules="emailRules"
-                  label="Adresse email"
+                  label="Adresse e-mail"
                   required
                   outlined
                   dense
@@ -66,9 +66,11 @@
                 <v-text-field
                   style="height: 40px"
                   v-model="body.password"
+                  :rules="passwordRules"
+                  :type="show1 ? 'text' : 'password'"
+                  :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                  @click:append="show1 = !show1"
                   label="Mot de passe"
-                  type="password"
-                  color="green"
                   required
                   outlined
                   dense
@@ -78,9 +80,11 @@
                 <v-text-field
                   style="height: 40px"
                   v-model="confirmPassword"
+                  :rules="[confirmPasswordRules, passwordConfirmationRule]"
+                  :type="show2 ? 'text' : 'password'"
+                  :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
+                  @click:append="show2 = !show2"
                   label="Confirmer"
-                  type="password"
-                  color="red"
                   required
                   outlined
                   dense
@@ -107,17 +111,23 @@
         </v-card-text>
       </v-card>
     </template>
+    <SnackBar />
   </v-dialog>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { apiClient } from '../services/ApiClient'
+import { mapState, mapMutations } from "vuex";
+import SnackBar from "./SnackBar";
 
 export default {
   name: "Registration",
+  components: { SnackBar },
   data: () => {
     return {
       valid: true,
+      show1: false,
+      show2: false,
       body: {
         firstname: "",
         lastname: "",
@@ -125,34 +135,51 @@ export default {
         password: "",
       },
       confirmPassword: "",
+      firstnameRules: [
+        (v) => !!v || "Veuillez renseignez votre prénom",
+        (v) => (v && v.length >= 2) || "Doit contenir au moins 2 caractères",
+      ],
+      lastnameRules: [
+        (v) => !!v || "Veuillez renseignez votre nom",
+        (v) => (v && v.length >= 2) || "Doit contenir au moins 2 caractères",
+      ],
       emailRules: [
-        (v) => !!v || "E-mail is required",
-        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+        (v) => !!v || "Veuillez renseignez votre e-mail",
+        (v) => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || "E-mail non valide",
+      ],
+      passwordRules: [
+        (v) => !!v || "Veuillez renseignez un mot de passe",
+        (v) => /^(?=.*\d).{4,8}$/.test(v) || "Doit contenir 4 à 8 caractères et 1 chiffre",
+      ],
+      confirmPasswordRules: [
+        (v) => !!v || "Veuillez confimez votre mot de passe"
       ],
     };
   },
   computed: {
     ...mapState(["status"]),
+    passwordConfirmationRule() {
+        return () => (this.body.password === this.confirmPassword) || 'Les mots de passe ne sont pas identiques'
+    },
   },
   methods: {
+    ...mapMutations(["SET_STATUS", "SET_SNACKBAR"]),
     validate() {
       const validate = this.$refs.form.validate();
       if (validate) this.register();
     },
     register() {
-      this.$store
-        .dispatch("register", this.body)
-        .then(
-          (user) => {
-            this.$emit("login", {
-              email: user.data.email,
-              password: this.body.password,
-            });
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
+      const body = this.body;
+      this.SET_STATUS("loading");
+      apiClient.post("/user/register", body)
+        .then(() => {
+          this.SET_STATUS("");
+          this.$emit('login', { email: this.body.email, password: this.body.password })
+        })
+        .catch(() => {
+          this.SET_STATUS("Email déjà existante");
+          this.SET_SNACKBAR(true);
+        });
     },
   },
 };
