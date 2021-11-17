@@ -14,11 +14,11 @@ module.exports = {
       },
       title: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING(500)
       },
       content: {
         allowNull: false,
-        type: DataTypes.STRING(1000)
+        type: DataTypes.STRING(10000)
       },
       likes: {
         allowNull: false,

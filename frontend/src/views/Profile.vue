@@ -1,16 +1,28 @@
 <template>
   <div>
     <v-layout class="white d-flex column align-center">
-      <v-card flat class="profil_header">
-        <v-img
-          class="red lighten-5 rounded-b-lg"
+      <v-card v-if="loading" flat class="profil_header">
+        <v-skeleton-loader
+          class="image_loader"
+          width="800px"
+          type="image"
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+          class="profil_avatar avatar_loader"
+          width="150px"
+          type="avatar"
+        ></v-skeleton-loader>
+      </v-card>
+      <v-card v-if="!loading" flat class="profil_header">
+        <img
+          class="grey lighten-4 rounded-b-lg"
+          style="object-fit: cover; max-width: 100%"
           width="800px"
           height="350px"
           :src="profilInfos.couverture"
-          contain
-        ></v-img>
+        />
         <v-avatar class="profil_avatar" height="150" width="150">
-          <v-img contain :src="profilInfos.avatar || '../avatar.png'"></v-img>
+          <v-img :src="profilInfos.avatar || '../avatar.png'"></v-img>
         </v-avatar>
       </v-card>
       <v-container>
@@ -40,42 +52,29 @@
     </v-layout>
     <v-divider></v-divider>
     <v-container class="mt-5">
-      <v-layout justify-center>
-        <v-row style="max-width: 600px">
-          <v-col cols="12" class="pa-1" v-for="post in posts" :key="post.id">
-            <Post
-              :post="post"
-              @changePost="updatePost"
-              @deletePost="deletePost"
-            />
-          </v-col>
-        </v-row>
-      </v-layout>
+      <PostForm />
+      <PostsList :userUuid="this.$route.params.uuid" />
     </v-container>
   </div>
 </template>
 
 <script>
-import { apiClient } from '../services/ApiClient'
+import { apiClient } from "../services/ApiClient";
 import EditProfile from "../components/EditProfile";
-import Post from "../components/Post";
+import PostsList from "../components/PostsList";
+import PostForm from "../components/PostForm";
 
 export default {
   name: "Posts",
-  components: { EditProfile, Post },
-  watch: {
-    $route() {
-      window.location.reload();
-    },
+  components: { EditProfile, PostsList, PostForm },
+  mounted() {
+    this.getProfile();
   },
   data: function() {
     return {
       profilInfos: {},
-      posts: [],
+      loading: false,
     };
-  },
-  mounted() {
-    this.getProfile();
   },
   computed: {
     editProfil() {
@@ -87,34 +86,34 @@ export default {
   },
   methods: {
     getProfile: function() {
+      this.loading = true;
       const self = this;
-      apiClient.get(`/user/${this.$route.params.uuid}`).then(function(response) {
-        self.profilInfos = response.data;
-        self.posts = response.data.posts;
-      });
-    },
-    deletePost(postId) {
-      this.posts.forEach((post, index) => {
-        if (post.id === postId) this.posts.splice(index, 1);
-      });
-    },
-    updatePost(newPost) {
-      this.posts.forEach((post, index) => {
-        if (post.id === newPost.id) this.posts.splice(index, 1, newPost);
-      });
+      apiClient
+        .get(`/user/${this.$route.params.uuid}`)
+        .then(function(response) {
+          self.profilInfos = response.data;
+          self.loading = false;
+        });
     },
   },
 };
 </script>
 
-<style scoped>
+<style>
 .profil_header {
   position: relative;
 }
 .profil_avatar {
-  position: absolute;
+  position: absolute !important;
   bottom: -15px;
   left: 50%;
   transform: translatex(-50%);
+}
+.image_loader > .v-skeleton-loader__image {
+  height: 350px;
+}
+.avatar_loader > .v-skeleton-loader__avatar {
+  width: 150px;
+  height: 150px;
 }
 </style>

@@ -29,7 +29,6 @@
             </v-col>
             <v-col cols="12" md="4">
               <v-avatar
-                class="profil_avatar"
                 height="150"
                 width="150"
               >

@@ -19,8 +19,8 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json());
 
-const userRoutes = require('./routes/user');
-const postRoutes = require('./routes/post');
+const userRoutes = require('./routes/user.routes');
+const postRoutes = require('./routes/post.routes');
 
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/api/user", userRoutes);

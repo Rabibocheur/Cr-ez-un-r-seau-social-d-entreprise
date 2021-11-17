@@ -31,51 +31,40 @@
         @change="onFileContent"
       ></v-file-input>
     </v-card>
-    <PostForm @sendPost="createPost" titleForm="Créer une publication" />
   </div>
 </template>
 
 <script>
 import { apiClient } from "../services/ApiClient";
-import { mapState, mapMutations } from "vuex";
-import { bus } from "../main";
+import { mapState, mapMutations, mapActions } from "vuex";
 import Avatar from "./Avatar";
-import PostForm from "./PostForm";
+
 
 export default {
   name: "ToPost",
-  components: { Avatar, PostForm },
+  components: { Avatar },
+  data() {
+    return {
+    };
+  },
   computed: {
-    ...mapState(["user"]),
+    ...mapState(["user", "posts"]),
   },
   methods: {
-    ...mapMutations(["SET_DIALOG"]),
+    ...mapMutations(["ADD_BODY_FILES"]),
+    ...mapActions(["openDialogPost"]),
     openPostDialog() {
-      this.SET_DIALOG(true);
+      this.openDialogPost({ title: 'Créer une publication', payload: {status: 'post', dialog: true} });
     },
     takeContent: function() {
       this.$refs.file.$children[0].$el.click();
     },
     onFileContent(event) {
-      bus.$emit("addFiles", event);
+      this.ADD_BODY_FILES(event)
       this.openPostDialog();
     },
-    createPost(payload) {
-      let body = {
-        title: payload.title,
-        content: payload.filesContent,
-      };
-
-      if (payload.isFormData) {
-        let formData = new FormData();
-        formData.append("title", payload.title);
-        for (const i of Object.keys(payload.filesContent)) {
-          formData.append("content", payload.filesContent[i]);
-        }
-        body = formData;
-      }
-
-      apiClient.post(`/post`, body).then((newPost) => {
+    createPost() {
+      apiClient.post(`/post`, this.posts.body).then((newPost) => {
         this.$emit("newPost", newPost.data);
       });
     },

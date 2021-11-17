@@ -1,10 +1,10 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="posts.dialog" persistent max-width="500px">
+    <v-dialog v-model="dialog" max-width="500px">
       <v-card class="pa-3 pt-0">
         <v-toolbar height="80" flat color="white">
           <v-toolbar-title class="text-center title" style="width: 100%">
-            {{ titleForm }}
+            {{ posts.titleFormPost }}
           </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn text @click="closePostDialog" fab>
@@ -22,15 +22,15 @@
         </v-card-title>
 
         <textarea
-          v-model="body.title"
+          v-model="posts.body.title"
           placeholder="Ecrivez quelque chose.."
           class="to_post my-2 white"
           rows="5"
         ></textarea>
 
         <v-btn
-          v-if="urlsContent.length > 0"
-          @click="deleteAllFile"
+          v-if="posts.urlsContent.length > 0"
+          @click="deleteAllFiles"
           small
           depressed
           class="bloc__image--close"
@@ -38,10 +38,10 @@
           <v-icon left>mdi-close</v-icon>
           <span>Annuler la sélection</span>
         </v-btn>
-        <div v-if="urlsContent.length > 0" class="bloc__image my-3 ">
+        <div v-if="posts.urlsContent.length > 0" class="bloc__image my-3">
           <div class="bloc__image__list d-flex justify-center flex-wrap">
             <div
-              v-for="(url, index) in urlsContent"
+              v-for="(url, index) in posts.urlsContent"
               :key="url"
               class="bloc__image__img"
             >
@@ -102,62 +102,51 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
-import { bus } from "../main";
+import { mapState, mapMutations, mapActions } from "vuex";
 import Avatar from "./Avatar";
 
 export default {
   name: "PostForm",
   components: { Avatar },
   props: ["titleForm"],
-  data: () => ({
-    body: {
-      title: "",
-      filesContent: [],
-      isFormData: false,
-    },
-    urlsContent: [],
-  }),
-  created() {
-    bus.$on("addFiles", (event) => this.onFileContent(event));
-  },
+  data: () => ({}),
   computed: {
     ...mapState(["user", "posts"]),
     isAddButtonDisabled() {
-      return !(this.body.title || this.urlsContent.length > 0);
+      return !(this.posts.body.title || this.posts.urlsContent.length > 0);
+    },
+    dialog: {
+      get() {
+        return this.posts.dialogFormPost;
+      },
+      set(value) {
+        this.closeDialogPost({ status: null, dialog: value });
+      },
     },
   },
   methods: {
-    ...mapMutations(["SET_DIALOG"]),
+    ...mapActions(["deleteOneFile", "sendThePost", "closeDialogPost"]),
+    ...mapMutations([
+      "ADD_BODY_FILES",
+      "DELETE_ALL_FILES",
+    ]),
     closePostDialog() {
-      this.SET_DIALOG(false);
+      this.closeDialogPost({ status: null, dialog: false });
     },
     takeContent: function() {
       this.$refs.file.$children[0].$el.click();
     },
     onFileContent(event) {
-      for (let i = 0; i < event.length; i++) {
-         this.urlsContent.push(URL.createObjectURL(event[i]));
-         this.body.filesContent.push(event[i]);
-      }
-      this.body.isFormData = true;
+      this.ADD_BODY_FILES(event);
     },
     deleteFile(index) {
-      this.urlsContent.splice(index, 1);
-      this.body.filesContent.splice(index, 1);
+      this.deleteOneFile(index);
     },
-    deleteAllFile() {
-      this.urlsContent = [];
-      this.body.filesContent = [];
-      this.body.isFormData = false;
+    deleteAllFiles() {
+      this.DELETE_ALL_FILES();
     },
     sendPost() {
-      this.$emit("sendPost", this.body);
-      this.body.title = "";
-      this.body.filesContent = [];
-      this.body.isFormData = false;
-      this.urlsContent = [];
-      this.closePostDialog();
+      this.sendThePost();
     },
   },
 };

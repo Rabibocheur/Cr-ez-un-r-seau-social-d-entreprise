@@ -1,75 +1,55 @@
 <template>
-  <v-container id="test" class="mt-5">
-    <v-layout justify-center>
-      <v-row style="max-width: 600px">
-        <v-col cols="12" class="pa-1">
-          <ToPost @newPost="pushNewPost" />
-        </v-col>
-        <v-col cols="12" class="pa-1" v-for="post in posts" :key="post.id">
-          <Post
-            :post="post"
-            @changePost="updatePost"
-            @deletePost="deletePost"
-          />
-        </v-col>
-        <v-progress-circular
-          :size="100"
-          :width="7"
-          color="purple"
-          indeterminate
-          class="loading"
-        ></v-progress-circular>
-      </v-row>
-    </v-layout>
-  </v-container>
+    <v-container class="container_posts mt-5 d-flex" fluid>
+      <div
+        class="pr-5"
+        style="width: 300px"
+        v-if="$vuetify.breakpoint.width > 800"
+      >
+        <SearchUsers />
+      </div>
+      <div class="container_posts-posts">
+        <v-layout justify-center>
+          <v-row style="max-width: 600px">
+            <v-col cols="12" class="pa-1">
+              <ToPost />
+              <PostForm />
+            </v-col>
+          </v-row>
+        </v-layout>
+        <PostsList />
+      </div>
+      <div style="width:300px" v-if="$vuetify.breakpoint.width > 1200">
+        <Discussion />
+      </div>
+    </v-container>
 </template>
 
 <script>
-import { apiClient } from '../services/ApiClient'
 import ToPost from "../components/ToPost";
-import Post from "../components/Post";
+import PostsList from "../components/PostsList";
+import PostForm from "../components/PostForm";
+import SearchUsers from "../components/SearchUsers";
+import Discussion from "../components/Discussion";
 
 export default {
   name: "Posts",
-  components: { ToPost, Post },
-  data: function() {
-    return {
-      posts: [],
-    };
-  },
-  mounted() {
-    this.getPosts();
-  },
-  methods: {
-    getPosts() {
-      apiClient.get(`/post`).then((response) => {
-        this.posts = response.data;
-      });
-    },
-    pushNewPost(post) {
-      this.posts.unshift(post);
-    },
-    deletePost(postId) {
-      this.posts.forEach((post, index) => {
-        if (post.id === postId) this.posts.splice(index, 1);
-      });
-    },
-    updatePost(newPost) {
-      this.posts.forEach((post, index) => {
-        if (post.id === newPost.id) this.posts.splice(index, 1, newPost);
-      });
-    },
-  },
+  components: { ToPost, PostsList, PostForm, SearchUsers, Discussion },
 };
 </script>
 
 <style lang="scss">
-.loading {
-  margin-top: 100px;
-  margin-bottom: 200px;
-  z-index: 100;
-  position: relative;
-  left: 50%;
-  transform: translatex(-50%);
+.container_posts {
+  justify-content: space-between;
+}
+.container_posts-posts {
+  padding: 0 20px;
+}
+@media screen and (max-width: 800px) {
+  .container_posts {
+    justify-content: center !important;
+  }
+  .container_posts-posts {
+    padding: 0;
+  }
 }
 </style>

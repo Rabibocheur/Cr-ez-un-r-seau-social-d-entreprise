@@ -6,14 +6,44 @@
       class="mx-3 py-2"
       style="border-bottom: 1px solid rgba(0, 0, 0, 0.2)"
     >
-      <div class="font-weight-light">
-        <div v-if="likesCount > 0">
-          <v-icon x-small class="mr-1 icon-like">
-            mdi-thumb-up
-          </v-icon>
-          <span class="subheading mr-2">{{ likesCount }}</span>
-        </div>
+      <div
+        v-if="likesCount > 0"
+        class="users_likes font-weight-light d-flex align-center"
+        @click="dialog = true"
+      >
+        <v-icon x-small class="mr-1 icon-like">
+          mdi-thumb-up
+        </v-icon>
+        <p v-if="likesCount === 1 && usersLikes[0] != undefined" class="mb-0">
+          {{ usersLikes[0].fullName }}
+        </p>
+        <p v-else-if="likesCount > 1" class="subheading mr-2 mb-0">
+          <span v-if="like">Vous et </span>
+          {{ like ? likesCount - 1 : likesCount }} personnes
+        </p>
       </div>
+
+      <v-dialog v-model="dialog" max-width="290">
+        <v-card>
+          <v-list>
+            <v-list-item
+              v-for="userLike in usersLikes"
+              :key="userLike.fullname"
+              link
+              route
+              :to="'/profile/' + userLike.uuid"
+            >
+              <v-list-item-avatar>
+                <img :src="userLike.avatar || '../avatar.png'" />
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>{{ userLike.fullName }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-dialog>
+
       <div class="font-weight-light">
         <span v-if="countAll > 0" class="mr-1">{{ countAll }}</span>
         <span v-if="countAll > 1" class="subheading">commentaires</span>
@@ -21,21 +51,19 @@
       </div>
     </v-layout>
     <div class="mx-3 py-1">
-        <v-btn depressed class="white" @click="postLike" style="width: 50%">
-          <v-icon class="mr-1" v-if="!like">mdi-thumb-up-outline</v-icon>
-          <v-icon class="mr-1" v-else :style="`${like ? 'color: blue' : ''}`"
-            >mdi-thumb-up</v-icon
-          >
-          <span class="mr-2" :style="`${like ? 'color: blue' : ''}`"
-            >J'aime</span
-          >
-        </v-btn>
-        <v-btn depressed class="white" @click="focusComment" style="width: 50%">
-          <v-icon class="mr-1">
-            mdi-message-outline
-          </v-icon>
-          <span>Commenter</span>
-        </v-btn>
+      <v-btn depressed class="white" @click="postLike" style="width: 50%">
+        <v-icon class="mr-1" v-if="!like">mdi-thumb-up-outline</v-icon>
+        <v-icon class="mr-1" v-else :style="`${like ? 'color: blue' : ''}`"
+          >mdi-thumb-up</v-icon
+        >
+        <span class="mr-2" :style="`${like ? 'color: blue' : ''}`">J'aime</span>
+      </v-btn>
+      <v-btn depressed class="white" @click="focusComment" style="width: 50%">
+        <v-icon class="mr-1">
+          mdi-message-outline
+        </v-icon>
+        <span>Commenter</span>
+      </v-btn>
     </div>
     <v-layout
       v-if="comments.length > 0"
@@ -89,6 +117,7 @@
               }}
             </p>
           </div>
+          
           <v-menu
             bottom
             right
@@ -108,9 +137,9 @@
             <v-list>
               <v-list-item link>
                 <v-list-item-title>
-                    <v-icon small left>mdi-pencil</v-icon>
-                    Modifier
-                  </v-list-item-title>
+                  <v-icon small left>mdi-pencil</v-icon>
+                  Modifier
+                </v-list-item-title>
               </v-list-item>
               <v-list-item link @click="deleteComment(comment.id)">
                 <v-list-item-title>
@@ -128,7 +157,7 @@
 </template>
 
 <script>
-import { apiClient } from '../services/ApiClient'
+import { apiClient } from "../services/ApiClient";
 import { mapState } from "vuex";
 import Avatar from "./Avatar";
 import ToComment from "./ToComment";
@@ -141,25 +170,31 @@ export default {
   props: ["postId", "likes"],
   data() {
     return {
+      dialog: false,
       moment: moment,
       comments: [],
+      showAllComments: false,
+      toComment: false,
       countAll: null,
       count: null,
-      showAllComments: false,
       likesCount: null,
-      like: null,
-      toComment: false,
+      like: false,
+      usersLikes: [],
     };
   },
   mounted() {
     this.getOneComment();
-    this.likesCount = this.likes;
     this.getLike();
   },
   computed: {
     ...mapState(["user"]),
   },
   methods: {
+    focusComment() {
+      this.toComment = !this.toComment;
+      const input = document.getElementById(`input--comment-${this.postId}`);
+      if (input != null) input.focus();
+    },
     getOneComment() {
       apiClient.get(`/post/${this.postId}/?limit=1`).then((response) => {
         this.comments = response.data.rows;
@@ -175,53 +210,70 @@ export default {
       });
     },
     addComment() {
-      this.getOneComment()
+      this.getOneComment();
     },
-    modifyComment(){
-      
-    },
+    modifyComment() {},
     deleteComment(commentId) {
       apiClient.delete(`/post/${commentId}/comment`).then(() => {
-        this.getOneComment()
+        this.getOneComment();
       });
     },
     getLike() {
-      apiClient.get(`/post/${this.postId}/like`).then((response) => {
-        if (response.data) this.like = true;
-        else this.like = false;
+      apiClient.get(`/post/${this.postId}/likes`).then((response) => {
+        for (const i of Object.keys(response.data)) {
+          this.likesCount++;
+          this.usersLikes.push({
+            uuid: response.data[i].user.uuid,
+            fullName: `${response.data[i].user.firstname} ${response.data[i].user.lastname}`,
+            avatar: response.data[i].user.avatar,
+          });
+          if (response.data[i].user.uuid === this.user.uuid) {
+            this.like = true;
+          }
+        }
       });
     },
     postLike() {
       apiClient.post(`/post/${this.postId}/like`).then((response) => {
-        if (response.data.like) {
-          this.like = true;
-          this.likesCount++;
-        } else {
+        if (response.data.like == false) {
+          this.usersLikes.forEach((user, index) => {
+            if (user.uuid === this.user.uuid) this.usersLikes.splice(index, 1);
+          });
           this.like = false;
           this.likesCount--;
+        } else {
+          this.usersLikes.push({
+            uuid: response.data.uuid,
+            fullName: `${response.data.firstname} ${response.data.lastname}`,
+            avatar: response.data.avatar,
+          });
+          this.like = true;
+          this.likesCount++;
         }
       });
-    },
-    focusComment() {
-      this.toComment = !this.toComment;
-      const input = document.getElementById(`input--comment-${this.postId}`);
-      if (input != null) input.focus();
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-  .icon-like {
-    border-radius: 50px;
-    background-color: blue;
-    color: white;
-    padding: 5px;
+.icon-like {
+  font-size: 15px !important;
+  border-radius: 50px;
+  background-color: blue;
+  color: white;
+  padding: 5px;
+}
+.comment_link {
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
   }
-  .comment_link{
-    cursor: pointer;
-    &:hover{
-      text-decoration: underline;
-    }
-  }
+}
+.users_likes {
+  cursor: pointer;
+}
+.users_likes p:hover {
+  text-decoration: underline;
+}
 </style>
