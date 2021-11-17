@@ -1,8 +1,0 @@
-post http://127.0.0.1:3000/api/post/1/like HTTP/1.1
-content-type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVXVpZCI6ImIzOTRiZTY0LTFhMTgtNDMzNi1iMzBhLTY3ODU5MGY3YWMyZSIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2MzQxNTIyNzcsImV4cCI6MTYzNDE1NTg3N30.2tnK7xaakqIJPWXsfc36giwaZTuCRyGb-hCHYyi5vnc
-
-{
-    "title": "ok",
-    "content": ""
-}
