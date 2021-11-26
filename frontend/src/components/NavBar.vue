@@ -1,20 +1,20 @@
 <template>
   <div>
     <v-app-bar class="white" app elevation="1">
-      <div class="d-flex flex-row align-center" style="max-width: 300px">
+      <div class="d-flex flex-row align-center" style="width: 300px">
         <router-link to="/">
           <v-img src="/icon.png" contain max-width="55" max-height="55">
           </v-img>
         </router-link>
 
-        <v-app-bar-nav-icon x-large @click="setDrawer" v-if="$vuetify.breakpoint.width < 800"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon x-large @click="setDrawerSearch" v-if="$vuetify.breakpoint.width < 800"></v-app-bar-nav-icon>
 
         <v-text-field
           v-if="$vuetify.breakpoint.width > 800"
           autofocus
           class="search ma-1"
           style="max-width: 240px"
-          v-model="search"
+  
           prepend-inner-icon="mdi-magnify"
           placeholder="Rechercher quelqu'un"
           filled
@@ -27,15 +27,6 @@
 
       <v-spacer></v-spacer>
 
-      <!-- <router-link to="/">
-        <v-img
-          v-if="$vuetify.breakpoint.width > 1100"
-          src="/icon-left-font-resize.png"
-          contain
-          max-width="250"
-          max-height="48"
-        ></v-img>
-      </router-link> -->
       <v-tooltip bottom v-if="$vuetify.breakpoint.width > 515">
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -87,7 +78,7 @@
         </v-btn>
 
         <div class="d-flex flex-row">
-          <v-btn icon class="mx-1 grey lighten-3" v-if="$vuetify.breakpoint.width < 1200">
+          <v-btn icon class="mx-1 grey lighten-3" @click="setDrawerConv">
             <v-icon color="black">mdi-facebook-messenger</v-icon>
           </v-btn>
           <v-btn icon class="mx-1 grey lighten-3">
@@ -159,22 +150,27 @@
       </div>
     </v-app-bar>
     <SearchUsersDrawer />
+    <DiscussionDrawer />
   </div>
 </template>
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
 import SearchUsersDrawer from "./SearchUsersDrawer";
+import DiscussionDrawer from "./DiscussionDrawer";
 
 export default {
   name: "NavBar",
-  components: { SearchUsersDrawer },
+  components: { SearchUsersDrawer, DiscussionDrawer },
   methods: {
     ...mapActions(["logout"]),
-    ...mapMutations(["SET_DRAWER"]),
-    setDrawer() {
-      this.SET_DRAWER(true);
+    ...mapMutations(["SET_DRAWER_SEARCH", "SET_DRAWER_CONV"]),
+    setDrawerSearch() {
+      this.SET_DRAWER_SEARCH(true);
     },
+    setDrawerConv(){
+      this.SET_DRAWER_CONV(true);
+    }
   },
   computed: {
     ...mapState(["user"]),

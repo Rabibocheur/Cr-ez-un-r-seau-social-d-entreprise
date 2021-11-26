@@ -22,7 +22,7 @@
           :src="profilInfos.couverture"
         />
         <v-avatar class="profil_avatar" height="150" width="150">
-          <v-img :src="profilInfos.avatar || '../avatar.png'"></v-img>
+          <img :src="profilInfos.avatar || '../avatar.png'" />
         </v-avatar>
       </v-card>
       <v-container>
@@ -53,12 +53,13 @@
     <v-divider></v-divider>
     <v-container class="mt-5">
       <PostForm />
-      <PostsList :userUuid="this.$route.params.uuid" />
+      <PostsList :userUuid="this.$route.params.uuid"/>
     </v-container>
   </div>
 </template>
 
 <script>
+import { mapMutations, mapActions } from 'vuex'
 import { apiClient } from "../services/ApiClient";
 import EditProfile from "../components/EditProfile";
 import PostsList from "../components/PostsList";
@@ -67,6 +68,12 @@ import PostForm from "../components/PostForm";
 export default {
   name: "Posts",
   components: { EditProfile, PostsList, PostForm },
+   watch: {
+     async "$route.params.uuid"(value) {
+      this.getProfile()
+      await this.initializePosts(value);
+    }
+  },
   mounted() {
     this.getProfile();
   },
@@ -85,10 +92,12 @@ export default {
     },
   },
   methods: {
-    getProfile: function() {
+    ...mapMutations(["SET_UUID_PROFIL"]),
+    ...mapActions(["initializePosts"]),
+    getProfile: async function() {
       this.loading = true;
       const self = this;
-      apiClient
+      await apiClient
         .get(`/user/${this.$route.params.uuid}`)
         .then(function(response) {
           self.profilInfos = response.data;

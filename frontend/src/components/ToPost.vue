@@ -1,6 +1,5 @@
 <template>
-  <div class="mb-6">
-    <v-card class="pa-1 rounded-lg" elevation="1">
+    <v-card class="mb-6 pa-1 rounded-lg" elevation="1">
       <v-layout class="d-flex mx-3 my-1">
         <Avatar
           :avatar="user.avatar"
@@ -31,7 +30,6 @@
         @change="onFileContent"
       ></v-file-input>
     </v-card>
-  </div>
 </template>
 
 <script>

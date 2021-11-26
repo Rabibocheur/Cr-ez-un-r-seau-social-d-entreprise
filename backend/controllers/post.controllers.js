@@ -12,9 +12,9 @@ exports.getAllPosts = async (req, res) => {
     order: [['createdAt', 'DESC']]
   }
 
-  if (req.query.userUuid) {
+  if (req.query.user) {
     const user = await models.User.findOne({
-      where: { uuid: req.query.userUuid },
+      where: { uuid: req.query.user },
     });
     options.where = {
       userId: user.id

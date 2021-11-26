@@ -1,48 +1,61 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import router from '../router/index'
-import posts from './posts'
+import Vue from "vue";
+import Vuex from "vuex";
+import posts from "./posts";
 
-Vue.use(Vuex)
+import { socket } from "../services/Socket";
+
+Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
+    drawerConv: false,
     drawerSearch: false,
-    status: '',
+    status: "",
     snackbar: false,
-    user: JSON.parse(localStorage.getItem('user'))
+    user: JSON.parse(localStorage.getItem("user")),
+    usersConv: [],
   },
   mutations: {
-    SET_DRAWER: function(state, value){
-      state.drawerSearch = value
+    SET_USER_CONV: function(state, value) {
+      state.usersConv.push(value)
     },
-    SET_STATUS: function (state, status) {
-      state.status = status
+    SET_DRAWER_SEARCH: function(state, value) {
+      state.drawerSearch = value;
     },
-    SET_SNACKBAR: function(state, snackbar){
-      state.snackbar = snackbar
+    SET_DRAWER_CONV: function(state, value) {
+      state.drawerConv = value;
     },
-    LOG_USER: function (state, user) {
-      localStorage.setItem('user', JSON.stringify(user.user))
-      localStorage.setItem('token', JSON.stringify(user.token))
+    SET_STATUS: function(state, status) {
+      state.status = status;
+    },
+    SET_SNACKBAR: function(state, snackbar) {
+      state.snackbar = snackbar;
+    },
+    LOG_USER: function(state) {
       state.user = JSON.parse(localStorage.getItem("user"));
-      router.push('/');
     },
-    LOGOUT_USER: function (state) {
+    LOGOUT_USER: function(state) {
       localStorage.clear();
-      state.user = {}
-    }
+      state.user = {};
+    },
   },
   actions: {
-    logout: ({commit}, expired) => {
-      if(expired) commit('SET_STATUS', 'Session expiré !')
-      commit('LOGOUT_USER')
-      router.push('/login');
+    loginUser: ({ commit }, user) => {
+      localStorage.setItem("user", JSON.stringify(user.user));
+      localStorage.setItem("token", JSON.stringify(user.token));
+      commit("LOG_USER");
+      location.reload();
+    },
+    logout: ({ commit }, expired) => {
+      if (expired) commit("SET_STATUS", "Session expiré !");
+      socket.disconnect();
+      commit("LOGOUT_USER");
+      location.reload();
     },
   },
   modules: {
     posts,
-  }
-})
+  },
+});
 
-export default store
+export default store;

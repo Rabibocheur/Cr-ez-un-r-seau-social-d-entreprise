@@ -1,7 +1,7 @@
 <template>
     <router-link :to="`/profile/${uuid}`">
         <v-avatar :size="size">
-            <v-img contain :src="avatar || '../avatar.png'"></v-img>
+            <img :src="avatar || '../avatar.png'">
         </v-avatar>
     </router-link>
 </template>

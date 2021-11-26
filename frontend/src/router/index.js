@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueRouteMiddleware from 'vue-route-middleware'
 import auth from './middleware/auth'
+import logout from './middleware/logout'
 
 Vue.use(VueRouter)
 
@@ -31,6 +32,9 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import('../views/Login.vue'),
+    meta: {
+      middleware: logout
+    }
   }
 ]
 

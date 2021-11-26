@@ -21,6 +21,8 @@ module.exports = {
       couverture: "",
       bio: null,
       isAdmin: false,
+      isConnected: false,
+      connectedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date()
      },{
@@ -33,6 +35,8 @@ module.exports = {
       couverture: "",
       bio: null,
       isAdmin: false,
+      isConnected: false,
+      connectedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date()
      },{
@@ -45,6 +49,8 @@ module.exports = {
       couverture: "",
       bio: null,
       isAdmin: true,
+      isConnected: false,
+      connectedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date()
      }], {});

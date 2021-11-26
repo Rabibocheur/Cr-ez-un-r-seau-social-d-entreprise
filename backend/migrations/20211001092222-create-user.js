@@ -47,6 +47,14 @@ module.exports = {
         allowNull: false,
         type: DataTypes.BOOLEAN
       },
+      isConnected: {
+        allowNull: false,
+        type: DataTypes.BOOLEAN
+      },
+      connectedAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

@@ -63,6 +63,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.BOOLEAN
     },
+    isConnected: {
+      allowNull: false,
+      type: DataTypes.BOOLEAN
+    },
+    connectedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
   }, {
     sequelize,
     tableName : 'users',

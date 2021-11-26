@@ -4,7 +4,7 @@ export default {
   state: {
     posts: [],
     page: 1,
-    isOnLastPage: false,
+    lastPage: false,
     loading: false,
     dialogFormPost: false,
     statusPost: null,
@@ -29,16 +29,16 @@ export default {
     LOADING_POST: function(state, value) {
       state.loading = value;
     },
-    RESET_STORE(state) {
+    RESET_POSTS(state) {
       state.posts = [];
       state.page = 1;
-      state.isOnLastPage = false;
+      state.lastPage = false;
     },
-    INCREMENT_PAGE(state) {
-      state.page++;
+    NEXT_PAGE(state) {
+      state.page ++;
     },
-    REACHED_LAST_PAGE(state) {
-      state.isOnLastPage = true;
+    LAST_PAGE_REACHED(state) {
+      state.lastPage = true;
     },
     ADD_POSTS: function(state, posts) {
       state.posts = posts;
@@ -135,7 +135,7 @@ export default {
         else state.body.content = "";
       }
     },
-    EMPTY_POST: function(state) {
+    EMPTY_POST_FORM: function(state) {
       state.body = {
         title: "",
         content: [],
@@ -170,7 +170,7 @@ export default {
       if (state.statusPost === "post") {
         commit("MODE_BACKUP");
       } else if (state.statusPost === "modify") {
-        commit("EMPTY_POST");
+        commit("EMPTY_POST_FORM");
       }
       commit("SET_DIALOG_FORM_POST", payload);
     },
@@ -197,7 +197,7 @@ export default {
     createPost: function({ state, commit }) {
       apiClient.post(`/post`, state.body).then((response) => {
         commit("ADD_NEW_POST", response.data);
-        commit("EMPTY_POST");
+        commit("EMPTY_POST_FORM");
       });
     },
     modifyPost: function({ state, commit }) {
@@ -205,19 +205,16 @@ export default {
         .put(`/post/${state.modify.postId}`, state.body)
         .then((response) => {
           commit("UPDATE_POST", response.data);
-          commit("EMPTY_POST");
+          commit("EMPTY_POST_FORM");
         });
     },
-    initializePostStore({ dispatch, commit }, userUuid) {
-      commit("RESET_STORE");
+    initializePosts({ dispatch, commit }, userUuid) {
+      commit("RESET_POSTS");
       dispatch("getPosts", userUuid);
     },
-    getPosts: function({ commit, state }, userUuid) {
-      if (userUuid) userUuid = `&userUuid=${userUuid}`;
-      else userUuid = "";
-
+    getPosts: function({ commit, state }, userUuid = "") {
       commit("LOADING_POST", true);
-      
+      if(userUuid != "") userUuid = `&user=${userUuid}`
       return new Promise(() => {
         apiClient
           .get(`/post?page=${state.page}${userUuid}`)
@@ -231,16 +228,13 @@ export default {
           });
       });
     },
-    async loadMore({ commit, dispatch, state }, userUuid) {
-      if (state.isOnLastPage) return;
-
-      commit("INCREMENT_PAGE");
-      const initialLength = state.posts.length;
-
+    async morePosts({ commit, dispatch, state }, userUuid) {
+      if (state.lastPage) return;
+      commit("NEXT_PAGE");
+      const currentLength = state.posts.length;
       await dispatch("getPosts", userUuid);
-
-      if (state.posts.length === initialLength) {
-        commit("REACHED_LAST_PAGE");
+      if (state.posts.length === currentLength) {
+        commit("LAST_PAGE_REACHED");
       }
     },
     deleteOnePost: function({ commit }, postId) {

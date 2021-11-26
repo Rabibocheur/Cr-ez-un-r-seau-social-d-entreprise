@@ -73,7 +73,7 @@
 
 <script>
 import { apiClient } from '../services/ApiClient'
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
 import Registration from "../components/Registration";
 import SnackBar from "../components/SnackBar";
 
@@ -101,7 +101,8 @@ export default {
     ...mapState(["status", "snackbar"]),
   },
   methods: {
-    ...mapMutations(["SET_STATUS", "LOG_USER", "SET_SNACKBAR"]),
+    ...mapMutations(["SET_STATUS", "SET_SNACKBAR"]),
+    ...mapActions(["loginUser"]),
     validate() {
       const validate = this.$refs.form.validate();
       if (validate) this.login();
@@ -116,7 +117,7 @@ export default {
       const body = this.body;
       apiClient.post("/user/login", body)
         .then((user) => {
-          this.LOG_USER(user.data);
+          this.loginUser(user.data);
           this.SET_STATUS("");
         })
         .catch(() => {

@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="dialog" max-width="500px">
+    <v-dialog v-model="dialog"  max-width="500px">
       <v-card class="pa-3 pt-0">
         <v-toolbar height="80" flat color="white">
           <v-toolbar-title class="text-center title" style="width: 100%">

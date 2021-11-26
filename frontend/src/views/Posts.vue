@@ -1,13 +1,14 @@
 <template>
-    <v-container class="container_posts mt-5 d-flex" fluid>
-      <div
-        class="pr-5"
-        style="width: 300px"
-        v-if="$vuetify.breakpoint.width > 800"
-      >
-        <SearchUsers />
-      </div>
-      <div class="container_posts-posts">
+  <v-container class="d-flex" fluid>
+    <div
+      class="pr-5"
+      style="min-width: 360px"
+      v-if="$vuetify.breakpoint.width > 800"
+    >
+      <SearchUsers />
+    </div>
+    <v-container class="container_posts mt-5 pt-0 d-flex justify-center">
+      <div class="container_posts-posts mt-3">
         <v-layout justify-center>
           <v-row style="max-width: 600px">
             <v-col cols="12" class="pa-1">
@@ -18,22 +19,32 @@
         </v-layout>
         <PostsList />
       </div>
-      <div style="width:300px" v-if="$vuetify.breakpoint.width > 1200">
-        <Discussion />
-      </div>
     </v-container>
+    <div v-if="$vuetify.breakpoint.width > 1200">
+      <DiscussionGlobal class="card_save"/>
+    </div>
+  </v-container>
 </template>
 
 <script>
+import { mapState } from "vuex";
 import ToPost from "../components/ToPost";
 import PostsList from "../components/PostsList";
 import PostForm from "../components/PostForm";
 import SearchUsers from "../components/SearchUsers";
-import Discussion from "../components/Discussion";
+import DiscussionGlobal from "../components/DiscussionGlobal";
 
 export default {
   name: "Posts",
-  components: { ToPost, PostsList, PostForm, SearchUsers, Discussion },
+  components: { ToPost, PostsList, PostForm, SearchUsers, DiscussionGlobal },
+  data() {
+    return {
+      msg: null
+    }
+  },
+  computed: {
+    ...mapState(["user"]),
+  },
 };
 </script>
 
@@ -51,5 +62,10 @@ export default {
   .container_posts-posts {
     padding: 0;
   }
+}
+.card_save {
+  position: sticky;
+  top: 100px;
+  height: 600px;
 }
 </style>

@@ -37,29 +37,22 @@ export default {
     window.removeEventListener("scroll", this.handleScroll);
   },
   async mounted() {
-    await this.initializePostStore(this.postsParams);
+    await this.initializePosts(this.userUuid);
   },
   computed: {
     ...mapState(["posts"]),
-    postsParams() {
-      if (this.userUuid) return this.userUuid;
-      else return "";
-    },
   },
   methods: {
-    ...mapActions(["initializePostStore", "loadMore"]),
+    ...mapActions(["initializePosts", "morePosts"]),
     ...mapMutations(["LOADING_POST"]),
     handleScroll() {
       const totalHeight = document.documentElement.scrollHeight;
       const scrollHeight = window.scrollY + window.innerHeight;
       const remainingOffset = totalHeight - scrollHeight;
 
-      if (remainingOffset < 200 && !this.posts.isOnLastPage) {
+      if (remainingOffset < 3 && !this.posts.lastPage) {
         this.LOADING_POST(true)
-      }
-
-      if (remainingOffset < 3) {
-        this.loadMore(this.postsParams);
+        this.morePosts(this.userUuid);
       }
     },
   },
