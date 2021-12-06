@@ -16,9 +16,9 @@
       <v-card v-if="!loading" flat class="profil_header">
         <img
           class="grey lighten-4 rounded-b-lg"
-          style="object-fit: cover; max-width: 100%"
+          style="object-fit: none; max-width: 100%"
           width="800px"
-          height="350px"
+          height="400px"
           :src="profilInfos.couverture"
         />
         <v-avatar class="profil_avatar" height="150" width="150">

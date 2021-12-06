@@ -39,6 +39,9 @@ exports.likePost = async (req, res) => {
       await likeExist.destroy();
       return res.status(200).json({ like: false });
     } else {
+      if(post.userId != user.id){
+        await models.Notification.create({ userId: post.userId, userSender: user.id, postId: post.id, content: 'aimé' })
+      }
       await post.update({ likes: post.likes + 1 });
       await models.Like.create({ userId: user.id, postId: req.params.postId });
       return res.status(200).json(user);

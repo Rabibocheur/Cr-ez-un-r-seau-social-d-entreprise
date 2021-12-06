@@ -19,7 +19,6 @@ exports.getAllPosts = async (req, res) => {
     options.where = {
       userId: user.id
     }
-    console.log(options)
   }
 
   models.Post.findAll(options)
@@ -27,9 +26,13 @@ exports.getAllPosts = async (req, res) => {
     .catch(error => res.status(400).json({ error }))
 };
 
-exports.createPost = async (req, res) => {
+exports.getOnePost = async (req, res) => {
+  models.Post.findOne({ where: { id: req.params.postId }, include: 'user' })
+    .then(post => res.status(200).json(post))
+    .catch(error => res.status(400).json({ error }))
+};
 
-  console.log(req.files)
+exports.createPost = async (req, res) => {
   let content = "";
   if (req.files) {
     const url = req.protocol + "://" + req.get("host");

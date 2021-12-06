@@ -1,78 +1,179 @@
 <template>
-  <v-navigation-drawer v-model="drawer" width="600px" fixed right temporary>
-    <v-card class="d-flex" style="height: 100vh">
-      <v-tabs vertical>
-        <v-tab style="width: 250px;">
-          <v-icon left>
-            mdi-account-group
-          </v-icon>
-          Global
-        </v-tab>
+  <v-dialog
+    v-model="dialog"
+    fullscreen
+    no-click-animation
+    hide-overlay
+    content-class="dialog_discussions"
+    transition="dialog-bottom-transition"
+  >
+    <v-card class="d-flex flex-row" style="height: 100%">
+      <div
+        v-show="$vuetify.breakpoint.width > 620 || messenger.selected == null"
+        style="width: 100%"
+      >
+        <div class="d-flex justify-space-between align-center py-2">
+          <h1 style="height: 10%; max-height: 70px" class="px-5">
+            Discussions
+          </h1>
+          <v-btn text @click="setDrawerConv" fab>
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </div>
 
-        <v-tab v-for="(userConv, index) in usersConv" :key="index">
-          <Avatar
-            :avatar="userConv.avatar"
-            :uuid="userConv.uuid"
-            size="36"
-            class="mr-2"
-          />
-          {{ userConv.firstname }} {{ userConv.lastname }}
-        </v-tab>
+        <v-list>
+          <v-list-item
+            link
+            @click="SELECTED_CHAT(-1)"
+            :class="messenger.selected == -1 ? 'blue lighten-5' : ''"
+            v-if="$vuetify.breakpoint.width < 1100"
+          >
+            <v-badge :color="'transparent'" offset-x="25" offset-y="40">
+              <v-list-item-avatar size="56">
+                <v-icon large>mdi-account-group</v-icon>
+              </v-list-item-avatar>
+            </v-badge>
+            <v-list-item-content>
+              <v-list-item-title class="text-left">
+                Global
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item
+            link
+            @click="SELECTED_CHAT(index)"
+            v-for="(chat, index) in messenger.privateChat"
+            :key="index"
+            :class="messenger.selected == index ? 'blue lighten-5' : ''"
+          >
+            <v-badge
+              :color="chat.notView > 0 ? 'red' : 'transparent'"
+              :content="chat.notView"
+              offset-x="25"
+              offset-y="40"
+            >
+              <v-list-item-avatar size="56">
+                <img :src="chat.to.avatar || '../avatar.png'" />
+              </v-list-item-avatar>
+            </v-badge>
+            <v-list-item-content>
+              <v-list-item-title class="text-left">
+                {{ chat.to.firstname }}
+                {{ chat.to.lastname }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </div>
 
-                
-        <v-tab-item style="border-left: 1px solid #80808030">
-          <DiscussionGlobal />
-        </v-tab-item>
-        <v-tab-item v-for="(userConv, index) in usersConv" :key="index">
-          <DiscussionPrivate :receiver="userConv" :firstMessages="firstMessage[userConv.uuid]"/>
-        </v-tab-item>
-      </v-tabs>
+      <div
+        style="border-left: 1px solid #80808030; width: 100%"
+        class="d-flex"
+        v-if="messenger.selected != null"
+      >
+        <DiscussionPrivate
+          class="rounded-0"
+          v-for="(chat, index) in messenger.privateChat"
+          :key="index"
+          v-show="messenger.selected == index"
+          :indexChat="index"
+          :to="chat.to"
+          :room="chat.room"
+          @goBack="goBack"
+        />
+
+        <DiscussionGlobal
+        style="width: 100%"
+          @goBack="goBack"
+          v-if="$vuetify.breakpoint.width < 1100 && messenger.selected == -1"
+        />
+      </div>
+      <DiscussionGlobal
+        v-if="$vuetify.breakpoint.width > 1100"
+        style="max-width: 400px; border-left: 1px solid #00000042 !important;"
+        class="rounded-0"
+      />
     </v-card>
-  </v-navigation-drawer>
+  </v-dialog>
 </template>
 
 <script>
 import { mapState, mapMutations } from "vuex";
 import DiscussionGlobal from "./DiscussionGlobal";
 import DiscussionPrivate from "./DiscussionPrivate";
-import Avatar from "./Avatar";
 import { socket } from "../services/Socket";
+import { apiClient } from "../services/ApiClient";
 
 export default {
   name: "DiscussionDrawer",
-  components: { DiscussionGlobal, DiscussionPrivate, Avatar },
+  components: { DiscussionPrivate, DiscussionGlobal },
   data() {
     return {
-      firstMessage: []
-    }
+      selected: 0,
+    };
+  },
+  created() {
+    apiClient.get("/chat/rooms").then(async (response) => {
+      for (let i in response.data) {
+        this.SET_PRIVATE_CHAT({
+          to:
+            response.data[i].user1.uuid === this.user.uuid
+              ? response.data[i].user2
+              : response.data[i].user1,
+          room: response.data[i].id,
+        });
+        const messages = await apiClient.get(
+          `/chat/room/${response.data[i].id}`
+        );
+        console.log(messages.data.viewed)
+        this.INITIALIZE_MESSAGES({ index: i, messages: messages.data });
+      }
+    });
   },
   mounted() {
     socket.on("private message", (data) => {
-        for(let i in this.usersConv){
-          if(this.usersConv[i].uuid === data.sender.uuid) return;
-        }
-        this.SET_USER_CONV(data.sender)
-        this.firstMessage[data.sender.uuid] = [{
-          uuid: data.sender.uuid,
-          avatar: data.sender.avatar,
-          fullname: `${data.sender.firstname} ${data.sender.lastname}`,
-          message: data.msg,
-        }]
+      this.SET_PRIVATE_CHAT({
+        to: data.user,
+        room: data.roomId,
+      });
+      this.NOTIFICATION_PRIVATE_CHAT(data.user);
     });
   },
   computed: {
-    ...mapState(["user", "drawerConv", "usersConv"]),
-    drawer: {
+    ...mapState(["user", "messenger"]),
+    dialog: {
       get() {
-        return this.drawerConv;
+        return this.messenger.drawerConv;
       },
       set(value) {
-        this.SET_DRAWER_CONV(value);
+        this.SET_DRAWER_CHAT(value);
       },
     },
   },
   methods: {
-    ...mapMutations(["SET_DRAWER_CONV", "SET_USER_CONV"])
+    ...mapMutations([
+      "SET_DRAWER_CHAT",
+      "SET_PRIVATE_CHAT",
+      "NOTIFICATION_PRIVATE_CHAT",
+      "SELECTED_CHAT",
+      "INITIALIZE_MESSAGES",
+    ]),
+    goBack() {
+      this.SELECTED_CHAT(null);
+    },
+    setDrawerConv() {
+      this.SET_DRAWER_CHAT(false);
+    },
   },
 };
 </script>
+
+<style>
+/* .dialog_discussions{
+    width: auto!important;
+    max-width: 100%!important;
+    height: 650px!important;
+    margin:0!important;
+    overflow: hidden!important;
+  } */
+</style>

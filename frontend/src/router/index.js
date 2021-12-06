@@ -16,6 +16,14 @@ const routes = [
     }
   },
   {
+    path: '/post/:postId',
+    name: 'OnePost',
+    component: () => import('../views/OnePost.vue'),
+    meta: {
+      middleware: auth
+    }
+  },
+  {
     path: '/profile/:uuid',
     name: 'Profile',
     component: () => import('../views/Profile.vue'),

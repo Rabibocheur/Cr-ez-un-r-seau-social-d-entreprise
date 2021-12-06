@@ -49,7 +49,7 @@ export default {
         content: this.toComment,
       };
       this.toComment = "";
-      apiClient.post(`/post/${this.postId}`, body).then(() => {
+      apiClient.post(`/post/comment/${this.postId}`, body).then(() => {
         this.$emit('newComment')
       });
     },

@@ -12,6 +12,7 @@
       </v-card-title>
       <v-card-text>
         <v-container>
+            <v-btn @click="crop">Crop</v-btn>
           <v-row>
             <v-col cols="12" md="8">
               <v-img
@@ -28,10 +29,7 @@
               ></v-file-input>
             </v-col>
             <v-col cols="12" md="4">
-              <v-avatar
-                height="150"
-                width="150"
-              >
+              <v-avatar height="150" width="150">
                 <img :src="urlAvatar || user.avatar || '../avatar.png'" />
               </v-avatar>
               <v-file-input
@@ -40,6 +38,17 @@
                 prepend-icon="mdi-camera"
                 @change="onFileAvatar"
               ></v-file-input>
+              <input type="file" @change="croppie" />
+              <vue-croppie
+                ref="croppieRef"
+                :enableOrientation="true"
+                :boundary="{ width: 450, height: 300 }"
+                :viewport="{ width: 400, height: 250, type: 'square' }"
+              >
+              </vue-croppie>
+              <!-- the result -->
+              <img :src="cropped" />
+            
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
@@ -81,7 +90,7 @@
 </template>
 
 <script>
-import { apiClient } from '../services/ApiClient'
+import { apiClient } from "../services/ApiClient";
 import { mapState } from "vuex";
 
 export default {
@@ -99,12 +108,41 @@ export default {
       fileAvatar: null,
       fileCouverture: null,
       isFormData: false,
+      croppieImage: "",
+      cropped: null,
     };
   },
   computed: {
     ...mapState(["user"]),
   },
   methods: {
+    croppie(e) {
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length) return;
+
+      var reader = new FileReader();
+      reader.onload = (e) => {
+        this.$refs.croppieRef.bind({
+          url: e.target.result,
+        });
+      };
+
+      reader.readAsDataURL(files[0]);
+      console.log(reader)
+    },
+    crop() {
+      // Options can be updated.
+      // Current option will return a base64 version of the uploaded image with a size of 600px X 450px.
+      let options = {
+        type: "base64",
+        size: { width: 600, height: 450 },
+        format: "jpeg",
+      };
+      this.$refs.croppieRef.result(options, (output) => {
+        this.cropped = this.croppieImage = output;
+        console.log(output);
+      });
+    },
     onFileAvatar: function(event) {
       this.urlAvatar = URL.createObjectURL(event);
       this.fileAvatar = event;
@@ -128,13 +166,14 @@ export default {
         formData.append("user", JSON.stringify(body));
         body = formData;
       }
-      
-      apiClient.put(`/user/${this.$store.state.user.uuid}`, body)
+
+      apiClient
+        .put(`/user/${this.$store.state.user.uuid}`, body)
         .then((user) => {
           localStorage.setItem("user", JSON.stringify(user.data));
-          this.$store.state.user = JSON.parse(localStorage.getItem('user'))
-          this.dialog = false
-          this.$emit('reload')
+          this.$store.state.user = JSON.parse(localStorage.getItem("user"));
+          this.dialog = false;
+          this.$emit("reload");
         });
     },
   },

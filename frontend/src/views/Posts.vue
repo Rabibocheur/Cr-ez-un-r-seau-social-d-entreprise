@@ -1,14 +1,13 @@
 <template>
-  <v-container class="d-flex" fluid>
+  <v-container class="d-flex mt-5" :class="$vuetify.breakpoint.width > 500 ? 'px-7' : 'pa-0'" fluid>
     <div
-      class="pr-5"
-      style="min-width: 360px"
-      v-if="$vuetify.breakpoint.width > 800"
+      class="card_save1 pr-5 d-flex"
+      v-if="$vuetify.breakpoint.width > 1200"
     >
       <SearchUsers />
     </div>
-    <v-container class="container_posts mt-5 pt-0 d-flex justify-center">
-      <div class="container_posts-posts mt-3">
+    <v-container class="container_posts mt-2 pt-0 d-flex justify-center" :class="$vuetify.breakpoint.width < 500 ? 'pa-0' : ''">
+      <div class="container_posts-posts">
         <v-layout justify-center>
           <v-row style="max-width: 600px">
             <v-col cols="12" class="pa-1">
@@ -20,8 +19,10 @@
         <PostsList />
       </div>
     </v-container>
-    <div v-if="$vuetify.breakpoint.width > 1200">
-      <DiscussionGlobal class="card_save"/>
+    <div class="card_save1" v-if="$vuetify.breakpoint.width > 800">
+      <DiscussionGlobal
+        class="card_save2"
+      />
     </div>
   </v-container>
 </template>
@@ -39,8 +40,8 @@ export default {
   components: { ToPost, PostsList, PostForm, SearchUsers, DiscussionGlobal },
   data() {
     return {
-      msg: null
-    }
+      msg: null,
+    };
   },
   computed: {
     ...mapState(["user"]),
@@ -54,6 +55,7 @@ export default {
 }
 .container_posts-posts {
   padding: 0 20px;
+  width: 100%;
 }
 @media screen and (max-width: 800px) {
   .container_posts {
@@ -63,9 +65,15 @@ export default {
     padding: 0;
   }
 }
-.card_save {
+.card_save1 {
   position: sticky;
-  top: 100px;
+  top: 88px;
+  max-height: 600px;
+   max-width: 360px
+}
+.card_save2 {
+    border: 1px solid #0000002f !important;
   height: 600px;
+  width: 360px;
 }
 </style>

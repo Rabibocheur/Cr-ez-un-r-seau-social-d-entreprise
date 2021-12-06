@@ -44,16 +44,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       validate: {
         notNull: true,
-        is: /^(?=.*\d).{4,8}$/
+        // is: /^(?=.*\d).{4,8}$/
       }
     },
     avatar: {
       allowNull: false,
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      defaultValue: ''
     },
     couverture: {
       allowNull: false,
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      defaultValue: ''
     },
     bio: {
       allowNull: true,
@@ -65,11 +67,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     isConnected: {
       allowNull: false,
-      type: DataTypes.BOOLEAN
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
     connectedAt: {
       allowNull: false,
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      defaultValue: new Date()
     },
   }, {
     sequelize,

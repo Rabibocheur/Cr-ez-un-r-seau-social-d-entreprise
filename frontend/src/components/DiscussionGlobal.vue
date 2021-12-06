@@ -1,17 +1,25 @@
 <template>
-  <v-card elevation="0" style="width: 360px">
-    <v-list style="height: 10%">
-      <v-list-item>
-        <v-list-item-avatar>
+  <v-card elevation="0">
+    <div
+      style="min-width: 360px; width: 100%; height: 10%; max-height: 70px"
+      class="d-flex align-center justify-space-between px-5"
+    >
+      <v-btn text @click="goBack" v-if="$vuetify.breakpoint.width < 620">
+        <v-icon>
+          mdi-arrow-left
+        </v-icon>
+      </v-btn>
+      <h4 class="d-flex align-center">
+        <v-avatar class="mr-3">
           <v-icon>mdi-account-group</v-icon>
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title class="title grey--text text--darken-1"
-            >Discussions Global</v-list-item-title
-          >
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
+        </v-avatar>
+        <span class="title">Tout le monde</span>
+      </h4>
+
+      <v-btn text @click="setDrawerConv" fab>
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </div>
 
     <v-divider></v-divider>
 
@@ -20,37 +28,20 @@
         <v-col
           cols="12"
           class="bulle_chat d-flex align-center py-0"
-          :class="message.user.uuid != user.uuid ? '' : 'flex-row-reverse'"
           v-for="(message, index) in messages"
           :key="index"
         >
-          <Avatar
-            v-if="message.user.uuid != user.uuid"
-            :avatar="message.user.avatar"
-            :uuid="message.user.uuid"
-            size="36"
-            class="mr-2"
-          />
           <v-tooltip left color="black">
             <template v-slot:activator="{ on, attrs }">
               <div
-                class="rounded-xl my-1 pa-1 px-3 grey lighten-4"
+                class="transparent rounded-xl my-1 pa-1 px-3"
                 v-bind="attrs"
                 v-on="on"
-                :style="
-                  message.user.uuid != user.uuid
-                    ? 'max-width: 300px'
-                    : 'max-width: 340px'
-                "
+                style="max-width: 100%"
               >
-                <router-link
-                  v-if="message.user.uuid != user.uuid"
-                  :to="`/profile/${message.user.uuid}`"
-                  class="black--text text-subtitle-2 font-weight-medium"
-                >
-                  {{ `${message.user.firstname} ${message.user.lastname}` }}
-                </router-link>
-                <p class="mb-0">{{ message.message }}</p>
+                <Avatar :avatar="message.user.avatar" size="28" class="mr-2" />
+                <span class="grey--text text--darken-1 text-body-2">{{ `${message.user.firstname} ${message.user.lastname}` }} </span>
+                <span class="mb-0">{{ message.message }}</span>
               </div>
             </template>
             <span>{{
@@ -63,9 +54,18 @@
       </v-row>
     </perfect-scrollbar>
 
-    <v-layout class="pa-3" style="height: 10%">
+    <v-divider></v-divider>
+
+    <v-layout
+      class="pa-3 d-flex flex-row align-center"
+      style="width: 100%; height: 10%; max-height: 70px"
+    >
       <v-icon @click="marker = !marker">mdi-emoticon</v-icon>
-      <VEmojiPicker style="position: absolute; top:0; left:0; width: 100%" v-if="marker" @select="selectEmoji" />
+      <VEmojiPicker
+        style="position: absolute; top:0; left:0; width: 100%"
+        v-if="marker"
+        @select="selectEmoji"
+      />
       <v-text-field
         placeholder="Ecrire un message ..."
         :append-outer-icon="value ? 'mdi-send' : 'fa-thumbs-up'"
@@ -80,12 +80,11 @@
         hide-details
       ></v-text-field>
     </v-layout>
-
   </v-card>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 import Avatar from "./Avatar";
 import { socket } from "../services/Socket";
 import { apiClient } from "../services/ApiClient";
@@ -101,7 +100,7 @@ export default {
       messages: [],
       value: "",
       moment: moment,
-      marker: false
+      marker: false,
     };
   },
   created() {
@@ -110,20 +109,24 @@ export default {
     });
   },
   mounted() {
-   socket.on("global message", (message) => {
+    socket.on("global message", (message) => {
       this.messages.push(message);
     });
-    
   },
   computed: {
     ...mapState(["user", "userReceiver"]),
   },
   methods: {
-    selectEmoji(emoji) { 
-      console.log(emoji)
-      this.value = emoji.data
+    ...mapMutations(["SET_DRAWER_CHAT"]),
+    goBack() {
+      this.$emit("goBack");
     },
-
+    setDrawerConv() {
+      this.SET_DRAWER_CHAT(false);
+    },
+    selectEmoji(emoji) {
+      this.value += emoji.data;
+    },
     sendMessage() {
       socket.emit("global message", {
         uuid: this.user.uuid,
@@ -135,9 +138,10 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .ps {
   height: 80%;
   max-height: 80vh;
+  background-color: #f0f2f59c;
 }
 </style>

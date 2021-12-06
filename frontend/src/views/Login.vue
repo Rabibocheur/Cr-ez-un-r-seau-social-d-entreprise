@@ -120,8 +120,8 @@ export default {
           this.loginUser(user.data);
           this.SET_STATUS("");
         })
-        .catch(() => {
-          this.SET_STATUS("Email et/ou mot de passe incorrect");
+        .catch((e) => {
+          this.SET_STATUS(e.response.data.error);
           this.SET_SNACKBAR(true);
         });
     },

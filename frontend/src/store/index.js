@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import posts from "./posts";
+import messenger from "./messenger";
 
 import { socket } from "../services/Socket";
 
@@ -8,22 +9,18 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    drawerConv: false,
     drawerSearch: false,
+    search: "",
     status: "",
     snackbar: false,
     user: JSON.parse(localStorage.getItem("user")),
-    usersConv: [],
   },
   mutations: {
-    SET_USER_CONV: function(state, value) {
-      state.usersConv.push(value)
+    SET_SEARCH_USER: function(state, value) {
+      state.search = value;
     },
     SET_DRAWER_SEARCH: function(state, value) {
       state.drawerSearch = value;
-    },
-    SET_DRAWER_CONV: function(state, value) {
-      state.drawerConv = value;
     },
     SET_STATUS: function(state, status) {
       state.status = status;
@@ -55,6 +52,7 @@ const store = new Vuex.Store({
   },
   modules: {
     posts,
+    messenger
   },
 });
 

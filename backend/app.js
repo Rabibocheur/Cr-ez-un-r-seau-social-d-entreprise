@@ -1,14 +1,11 @@
 const path = require("path");
 const models = require("./models");
+const Sequelize = require("sequelize");
 
 const express = require("express");
 const app = express();
 
 const server = require("http").createServer(app);
-
-const io = require("socket.io")(server, {
-  cors: { origin: "*", methods: ["GET", "POST"] },
-});
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -26,14 +23,23 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Routes
 const userRoutes = require("./routes/user.routes");
 const postRoutes = require("./routes/post.routes");
 const chatRoutes = require("./routes/chat.routes");
+const notificationRoutes = require("./routes/notification.routes");
 
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/api/user", userRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/notification", notificationRoutes);
+
+
+// Socket
+const io = require("socket.io")(server, {
+  cors: { origin: "*", methods: ["GET", "POST"] },
+});
 
 let users = [];
 
@@ -73,15 +79,55 @@ io.on("connection", (socket) => {
 
       io.emit("global message", message);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   });
 
-  socket.on("private message", function (data) {
-    var socketId = users[data.receiver.uuid];
-    console.log("\n" + socketId);
-    console.log("\n" + data.msg);
-    io.to(socketId).emit("private message", data);
+  socket.on("private message", async function ({ sender, receiver, message }) {
+    try {
+      const userSender = await models.User.findOne({
+        where: { uuid: sender },
+      });
+
+      const userReceiver = await models.User.findOne({
+        where: { uuid: receiver },
+      });
+
+      let room = await models.Room.findOne({
+        where: {
+          userId1: {
+            [Sequelize.Op.or]: [userSender.id, userReceiver.id]
+          },
+          userId2: {
+            [Sequelize.Op.or]: [userSender.id, userReceiver.id]
+          }
+        },
+      })
+
+      if(!room){
+        room = await models.Room.create({
+          userId1: userSender.id,
+          userId2: userReceiver.id
+        })
+      }
+
+      const newMessage = await models.Private.create({
+        userId: userSender.id,
+        roomId: room.id,
+        message: message,
+      });
+
+      const messageFind = await models.Private.findOne({
+        where: { id: newMessage.id },
+        include: "user",
+      });
+
+      const socketId = users[receiver];
+      io.to(socketId).emit("private message", messageFind);
+
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   socket.on("disconnect", async () => {

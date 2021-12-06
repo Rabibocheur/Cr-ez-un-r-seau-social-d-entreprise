@@ -97,19 +97,57 @@
           <Avatar
             :avatar="comment.user.avatar"
             :uuid="comment.user.uuid"
-            size="36"
+            size="32"
           />
-          <div class="mx-2">
-            <div class="rounded-xl pa-2 px-3 grey lighten-4">
-              <router-link
-                :to="`/profile/${comment.user.uuid}`"
-                class="black--text text-subtitle-2 font-weight-medium"
+
+          <div class="mx-2 d-flex flex-column">
+            <div class="d-flex">
+              <div class="rounded-lg pa-1 px-3 blue-grey lighten-5">
+                <router-link
+                  :to="`/profile/${comment.user.uuid}`"
+                  class="black--text caption font-weight-bold"
+                >
+                  {{ `${comment.user.firstname} ${comment.user.lastname}` }}
+                </router-link>
+                <p class="mb-0 text-body-2 font-weight-regular">
+                  {{ comment.content }}
+                </p>
+              </div>
+              <v-menu
+                bottom
+                right
+                v-if="comment.user.uuid === user.uuid || user.isAdmin"
               >
-                {{ `${comment.user.firstname} ${comment.user.lastname}` }}
-              </router-link>
-              <p class="mb-0">{{ comment.content }}</p>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    small
+                    v-bind="attrs"
+                    v-on="on"
+                    class="white align-self-center ml-2"
+                  >
+                    <v-icon>mdi-dots-horizontal</v-icon>
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item link>
+                    <v-list-item-title>
+                      <v-icon small left>mdi-pencil</v-icon>
+                      Modifier
+                    </v-list-item-title>
+                  </v-list-item>
+                  <v-list-item link @click="deleteComment(comment.id)">
+                    <v-list-item-title>
+                      <v-icon small left>mdi-delete</v-icon>
+                      Supprimer
+                    </v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
             </div>
-            <p class="text-caption grey--text text--darken-2 ma-0">
+            <p
+              class="text-caption grey--text text--darken-2 ma-0"
+            >
               {{
                 moment(comment.createdAt)
                   .locale("fr")
@@ -117,38 +155,6 @@
               }}
             </p>
           </div>
-          
-          <v-menu
-            bottom
-            right
-            v-if="comment.user.uuid === user.uuid || user.isAdmin"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                small
-                v-bind="attrs"
-                v-on="on"
-                class="white align-self-center"
-              >
-                <v-icon>mdi-dots-horizontal</v-icon>
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item link>
-                <v-list-item-title>
-                  <v-icon small left>mdi-pencil</v-icon>
-                  Modifier
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item link @click="deleteComment(comment.id)">
-                <v-list-item-title>
-                  <v-icon small left>mdi-delete</v-icon>
-                  Supprimer
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
         </v-col>
       </v-row>
     </v-layout>
@@ -196,7 +202,7 @@ export default {
       if (input != null) input.focus();
     },
     getOneComment() {
-      apiClient.get(`/post/${this.postId}/?limit=1`).then((response) => {
+      apiClient.get(`/post/comment/${this.postId}/?limit=1`).then((response) => {
         this.comments = response.data.rows;
         this.countAll = response.data.count;
         this.count = this.countAll;
@@ -204,7 +210,7 @@ export default {
       });
     },
     getAllComments() {
-      apiClient.get(`/post/${this.postId}`).then((response) => {
+      apiClient.get(`/post/comment/${this.postId}`).then((response) => {
         this.comments = response.data.rows;
         this.showAllComments = true;
       });
@@ -214,12 +220,12 @@ export default {
     },
     modifyComment() {},
     deleteComment(commentId) {
-      apiClient.delete(`/post/${commentId}/comment`).then(() => {
+      apiClient.delete(`/post/comment/${commentId}`).then(() => {
         this.getOneComment();
       });
     },
     getLike() {
-      apiClient.get(`/post/${this.postId}/likes`).then((response) => {
+      apiClient.get(`/post/likes/${this.postId}`).then((response) => {
         for (const i of Object.keys(response.data)) {
           this.likesCount++;
           this.usersLikes.push({
@@ -234,7 +240,7 @@ export default {
       });
     },
     postLike() {
-      apiClient.post(`/post/${this.postId}/like`).then((response) => {
+      apiClient.post(`/post/like/${this.postId}`).then((response) => {
         if (response.data.like == false) {
           this.usersLikes.forEach((user, index) => {
             if (user.uuid === this.user.uuid) this.usersLikes.splice(index, 1);

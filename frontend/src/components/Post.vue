@@ -1,7 +1,9 @@
 <template>
-  <v-card class="mt-1 pa-1 rounded-lg" elevation="1">
+  <v-card class="mt-1 py-1 rounded-lg" elevation="1">
     <v-card-title class="mx-3 my-1 pa-0">
-      <Avatar :avatar="post.user.avatar" :uuid="post.user.uuid" size="38" />
+      <router-link :to="`/profile/${post.user.uuid}`">
+        <Avatar :avatar="post.user.avatar" size="38" />
+      </router-link>
       <v-layout column class="ml-3">
         <router-link
           :to="`/profile/${post.user.uuid}`"
@@ -20,7 +22,7 @@
       <v-menu bottom left v-if="post.user.uuid === user.uuid || user.isAdmin">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on">
-            <v-icon large>mdi-dots-horizontal</v-icon>
+            <v-icon >mdi-dots-horizontal</v-icon>
           </v-btn>
         </template>
         <v-list>
@@ -48,7 +50,10 @@
       {{ post.title }}
     </v-card-text>
 
-    <v-layout v-if="post.content.length < 10" class="d-flex flex-wrap justify-center">
+    <v-layout
+      v-if="post.content.length < 10"
+      class="d-flex flex-wrap justify-center"
+    >
       <img
         class="gallery"
         :class="resizeFiles"
@@ -61,12 +66,16 @@
     </v-layout>
 
     <v-container v-if="post.content.length >= 10" class="container_pictures">
-      <h5 class="container_pictures--count">{{ post.content.length }} fichiers</h5>
-      <Masonry :urls="post.content"/>
+      <h5 class="container_pictures--count">
+        {{ post.content.length }} fichiers
+      </h5>
+      <Masonry :urls="post.content" />
     </v-container>
 
     <v-divider></v-divider>
+
     <Comment :likes="post.likes" :postId="post.id" />
+    
   </v-card>
 </template>
 
@@ -88,13 +97,13 @@ export default {
     };
   },
   computed: {
-    ...mapState(["user", "posts"]),
-    resizeFiles(){
-      let test = '';
-      if(this.post.content.length > 3) test = 'test1';
-      if(this.post.content.length > 6) test = 'test2';
-      return test
-    }
+    ...mapState(["user"]),
+    resizeFiles() {
+      let test = "";
+      if (this.post.content.length > 3) test = "test1";
+      if (this.post.content.length > 6) test = "test2";
+      return test;
+    },
   },
   methods: {
     ...mapActions(["openDialogPost", "deleteOnePost"]),
@@ -103,7 +112,7 @@ export default {
       "SET_ITEMS_DIALOG",
       "SET_INDEX_DIALOG",
       "SET_DIALOG_FORM_POST",
-      "MODE_MODIFY_POST"
+      "MODE_MODIFY_POST",
     ]),
     galleryFullScreen(index) {
       this.SET_ITEMS_DIALOG(this.post.content);
@@ -114,22 +123,29 @@ export default {
       this.$refs.imagePrincipal.src = event.originalTarget.src;
     },
     editPost(postId) {
-      this.MODE_MODIFY_POST({ urls: this.post.content, title: this.post.title, postId });
-      this.openDialogPost({ title: 'Modifier une publication', payload: {status: 'modify', dialog: true}});
+      this.MODE_MODIFY_POST({
+        urls: this.post.content,
+        title: this.post.title,
+        postId,
+      });
+      this.openDialogPost({
+        title: "Modifier une publication",
+        payload: { status: "modify", dialog: true },
+      });
     },
     deletePost(postId) {
-      this.deleteOnePost(postId)
+      this.deleteOnePost(postId);
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.test1{
-  max-height: 200px!important;
+.test1 {
+  max-height: 150px !important;
 }
-.test2{
-  max-height: 100px!important;
+.test2 {
+  max-height: 100px !important;
   max-width: 32.5%;
 }
 .gallery {
@@ -166,16 +182,15 @@ export default {
   position: relative;
   overflow: hidden;
 }
-.container_pictures--count  {
+.container_pictures--count {
   background-color: rgba(43, 39, 39, 0.781);
-  color:rgb(243, 235, 235);
+  color: rgb(243, 235, 235);
   font-size: 20px;
   font-weight: 400;
   padding: 8px;
   border-radius: 3px;
   position: absolute;
-  top:0;
-  right:0;
-  z-index: 1;
+  top: 0;
+  right: 0;
 }
 </style>

@@ -1,20 +1,37 @@
 <template>
   <div>
-    <v-app-bar class="white" app elevation="1">
-      <div class="d-flex flex-row align-center" style="width: 300px">
+    <v-app-bar
+      class="white"
+      :style="
+        $vuetify.breakpoint.width > 500 ? 'padding: 0 28px' : 'padding: 0'
+      "
+      height="56px"
+      app
+      elevation="1"
+    >
+      <div
+        class="d-flex flex-row align-center"
+        :style="
+          $vuetify.breakpoint.width < 1200 ? 'width: 150px' : 'width: 300px'
+        "
+      >
         <router-link to="/">
           <v-img src="/icon.png" contain max-width="55" max-height="55">
           </v-img>
         </router-link>
 
-        <v-app-bar-nav-icon x-large @click="setDrawerSearch" v-if="$vuetify.breakpoint.width < 800"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon
+          x-large
+          @click="setDrawerSearch"
+          v-if="$vuetify.breakpoint.width < 1200"
+        ></v-app-bar-nav-icon>
 
         <v-text-field
-          v-if="$vuetify.breakpoint.width > 800"
+          v-if="$vuetify.breakpoint.width > 1200"
+          v-model="setSearch"
           autofocus
           class="search ma-1"
           style="max-width: 240px"
-  
           prepend-inner-icon="mdi-magnify"
           placeholder="Rechercher quelqu'un"
           filled
@@ -43,7 +60,7 @@
         <span>Fil d'actualité</span>
       </v-tooltip>
 
-      <v-tooltip bottom v-if="$vuetify.breakpoint.width > 515">
+      <!-- <v-tooltip bottom v-if="$vuetify.breakpoint.width > 515">
         <template v-slot:activator="{ on, attrs }">
           <v-btn
             v-bind="attrs"
@@ -56,20 +73,21 @@
           </v-btn>
         </template>
         <span>Fil à suivre</span>
-      </v-tooltip>
+      </v-tooltip> -->
 
       <v-spacer></v-spacer>
 
       <div class="account_menu d-flex flex-row justify-end">
         <v-btn
+          ripple
           v-if="$vuetify.breakpoint.width > 1050"
           depressed
           color="transparent"
           route
           :to="`/profile/${user.uuid}`"
-          class="test mr-5 pa-2 py-6 d-flex align-center text-capitalize rounded-pill"
+          class="btn-user mr-5 pa-2 py-6 d-flex align-center text-capitalize rounded-pill"
         >
-          <v-avatar size="34">
+          <v-avatar size="28">
             <img :src="user.avatar || '../avatar.png'" />
           </v-avatar>
           <span class="black--text font-weight-medium ml-2 text-body-1">
@@ -77,16 +95,19 @@
           </span>
         </v-btn>
 
-        <div class="d-flex flex-row">
-          <v-btn icon class="mx-1 grey lighten-3" @click="setDrawerConv">
-            <v-icon color="black">mdi-facebook-messenger</v-icon>
-          </v-btn>
-          <v-btn icon class="mx-1 grey lighten-3">
-            <v-icon color="black">mdi-bell</v-icon>
-          </v-btn>
+        <div class="d-flex flex-row align-center">
+          <Discussions @click="setDrawerConv" />
+          <Notifications />
           <v-menu transition="slide-x-transition" bottom right>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn icon class="grey lighten-3" v-bind="attrs" v-on="on">
+              <v-btn
+                icon
+                class="grey lighten-3"
+                v-bind="attrs"
+                v-on="on"
+                height="40px"
+                width="40px"
+              >
                 <v-icon large color="black">
                   mdi-menu-down
                 </v-icon>
@@ -116,14 +137,6 @@
                   </v-list-item-avatar>
                   <v-list-item-content>
                     <v-list-item-title>Voir l'accueil</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-avatar>
-                    <v-icon>mdi-account-box-multiple</v-icon>
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-list-item-title>Personnes à suivre</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
                 <v-list-item>
@@ -158,31 +171,42 @@
 import { mapState, mapActions, mapMutations } from "vuex";
 import SearchUsersDrawer from "./SearchUsersDrawer";
 import DiscussionDrawer from "./DiscussionDrawer";
+import Discussions from "./Discussions";
+import Notifications from "./Notifications";
 
 export default {
   name: "NavBar",
-  components: { SearchUsersDrawer, DiscussionDrawer },
+  components: {
+    SearchUsersDrawer,
+    DiscussionDrawer,
+    Discussions,
+    Notifications,
+  },
   methods: {
-    ...mapActions(["logout"]),
-    ...mapMutations(["SET_DRAWER_SEARCH", "SET_DRAWER_CONV"]),
+    ...mapActions(["logout", "search"]),
+    ...mapMutations(["SET_DRAWER_SEARCH", "SET_DRAWER_CHAT", "SET_SEARCH_USER"]),
     setDrawerSearch() {
       this.SET_DRAWER_SEARCH(true);
     },
-    setDrawerConv(){
-      this.SET_DRAWER_CONV(true);
-    }
+    setDrawerConv() {
+      this.SET_DRAWER_CHAT(true);
+    },
   },
   computed: {
     ...mapState(["user"]),
+    setSearch: {
+      set(value) {
+        this.SET_SEARCH_USER(value);
+      },
+    },
   },
 };
 </script>
 
 <style lang="scss">
 .v-toolbar__content {
-  padding: 0 16px !important;
+  padding: 0 !important;
 }
-
 .btn-home,
 .btn-follow {
   width: 150px;
@@ -191,6 +215,11 @@ export default {
 .btn-follow.v-btn--active {
   border-bottom: 3px solid #fd2f04;
   border-radius: none !important;
+}
+.btn-user.v-btn::before {
+  top: initial;
+  bottom: initial;
+  height: 40px;
 }
 .btn-home.v-btn::before,
 .btn-follow.v-btn::before {

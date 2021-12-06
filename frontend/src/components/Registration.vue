@@ -15,7 +15,7 @@
     </template>
     <template v-slot:default="dialog">
       <v-card>
-        <v-toolbar height="100" flat color="white" class="pb-3">
+        <v-toolbar height="100" flat color="white" class="px-5 pb-3">
           <v-toolbar-title class="d-flex flex-column align-start display-1">
             S'inscrire
             <span class="text-body-1">C’est rapide et facile.</span>
@@ -176,8 +176,8 @@ export default {
           this.SET_STATUS("");
           this.$emit('login', { email: this.body.email, password: this.body.password })
         })
-        .catch(() => {
-          this.SET_STATUS("Email déjà existante");
+        .catch((e) => {
+          this.SET_STATUS(e.response.data.error);
           this.SET_SNACKBAR(true);
         });
     },

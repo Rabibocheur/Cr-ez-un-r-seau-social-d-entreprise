@@ -7,6 +7,10 @@ const Sequelize =  require('sequelize');
 exports.register = (req, res) => {
   const { firstname, lastname, email, password } = req.body;
 
+  if(!/^(?=.*\d).{4,8}$/.test(password)){
+    return res.status(400).json({ error: "password incorrect" }); 
+  }
+
   models.User.findOne({ where: { email } })
     .then((user) => {
       if (!user) {
@@ -18,17 +22,17 @@ exports.register = (req, res) => {
               lastname,
               email,
               password: bcryptedPassword,
-              isAdmin: 0,
+              isAdmin: 0
             })
               .then((newUser) => {
                 res.status(201).json(newUser);
               })
-              .catch(() => res.status(500).json({ error: "cannot add user" }));
+              .catch((e) => res.status(500).json(e));
           })
           .catch((error) => res.status(500).json({ error }));
-      } else return res.status(400).json({ error: "email already exist" });
+      } else return res.status(400).json({ error: "Email dèjà existant !" });
     })
-    .catch(() => res.status(500).json({ error: "unable to verify user" }));
+    .catch(() => res.status(500).json({ error: "Un problème est survenu" }));
 };
 
 exports.login = (req, res) => {
@@ -47,23 +51,20 @@ exports.login = (req, res) => {
             if (!valid) {
               return res
                 .status(400)
-                .json({ error: "Mot de passe incorrect !" });
+                .json({ error: "Adresse email ou mot de passe incorrect" });
             }
             res.status(200).json({
               user,
               token: jwt.sign(
                 { userUuid: user.uuid, isAdmin: user.isAdmin },
-                "SECRET_TOKEN",
-                {
-                  expiresIn: "1h",
-                }
+                "SECRET_TOKEN"
               ),
             });
           })
           .catch((error) => res.status(500).json({ error }));
-      } else return res.status(400).json({ error: "user not exist" });
+      } else return res.status(400).json({ error: "Adresse email ou mot de passe incorrect" });
     })
-    .catch(() => res.status(500).json({ error: "unable to verify user" }));
+    .catch(() => res.status(500).json({ error: "Un problème est survenu" }));
 };
 
 exports.getUserProfile = (req, res) => {
