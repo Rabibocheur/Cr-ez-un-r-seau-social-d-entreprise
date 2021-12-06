@@ -3,7 +3,7 @@ import store from "../store/index";
 const axios = require("axios");
 
 const instance = axios.create({
-  baseURL: "http://127.0.0.1:3000/api",
+  baseURL: "/api",
 });
 
 class ApiClient {

@@ -96,7 +96,7 @@
         </v-btn>
 
         <div class="d-flex flex-row align-center">
-          <Discussions @click="setDrawerConv" />
+          <DiscussionsMenu @click="setDrawerConv" />
           <Notifications />
           <v-menu transition="slide-x-transition" bottom right>
             <template v-slot:activator="{ on, attrs }">
@@ -171,7 +171,7 @@
 import { mapState, mapActions, mapMutations } from "vuex";
 import SearchUsersDrawer from "./SearchUsersDrawer";
 import DiscussionDrawer from "./DiscussionDrawer";
-import Discussions from "./Discussions";
+import DiscussionsMenu from "./DiscussionsMenu";
 import Notifications from "./Notifications";
 
 export default {
@@ -179,7 +179,7 @@ export default {
   components: {
     SearchUsersDrawer,
     DiscussionDrawer,
-    Discussions,
+    DiscussionsMenu,
     Notifications,
   },
   methods: {

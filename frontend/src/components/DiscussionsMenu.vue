@@ -1,29 +1,46 @@
 <template>
   <div>
-    <v-btn
+    <v-badge
       v-if="$vuetify.breakpoint.width < 1100"
-      v-bind="attrs"
-      v-on="on"
-      icon
-      class="mx-1 grey lighten-3"
-      height="40px"
-      width="40px"
-      @click="setDrawerConv()"
+      bottom
+      :color="!messenger.viewed ? 'transparent' : 'red darken-2'"
+      dot
+      offset-x="45"
+      offset-y="35"
     >
-      <v-icon color="black">mdi-facebook-messenger</v-icon>
-    </v-btn>
+      <v-btn
+        v-bind="attrs"
+        v-on="on"
+        icon
+        class="mx-1 grey lighten-3"
+        height="40px"
+        width="40px"
+        @click="setDrawerConv(); SET_VIEWED()"
+      >
+        <v-icon color="black">mdi-facebook-messenger</v-icon>
+      </v-btn>
+    </v-badge>
     <v-menu offset-y v-if="$vuetify.breakpoint.width > 1100">
       <template v-slot:activator="{ attrs, on }">
-        <v-btn
-          v-bind="attrs"
-          v-on="on"
-          icon
-          class="mx-1 grey lighten-3"
-          height="40px"
-          width="40px"
+        <v-badge
+          bottom
+          :color="!messenger.viewed ? 'transparent' : 'red darken-2'"
+          dot
+          offset-x="45"
+          offset-y="35"
         >
-          <v-icon color="black">mdi-facebook-messenger</v-icon>
-        </v-btn>
+          <v-btn
+            v-bind="attrs"
+            v-on="on"
+            icon
+            class="mx-1 grey lighten-3"
+            height="40px"
+            width="40px"
+            @click="SET_VIEWED()"
+          >
+            <v-icon color="black">mdi-facebook-messenger</v-icon>
+          </v-btn>
+        </v-badge>
       </template>
 
       <v-card class="pt-5 px-2" max-height="500px" min-width="300px">
@@ -85,6 +102,7 @@
                 </v-list-item-title>
                 <v-list-item-subtitle
                   v-if="chat.messages[chat.messages.length - 1] != undefined"
+                  :class="chat.notView > 0 ? 'blue--text text--darken-2 font-weight-medium' : ''"
                 >
                   {{
                     chat.messages[chat.messages.length - 1].user.uuid ==
@@ -119,7 +137,7 @@ export default {
     ...mapState(["user", "messenger"]),
   },
   methods: {
-    ...mapMutations(["SET_DRAWER_CHAT", "ADD_PRIVATE_POPUP"]),
+    ...mapMutations(["SET_DRAWER_CHAT", "ADD_PRIVATE_POPUP", "SET_VIEWED"]),
     addPopup(index) {
       this.ADD_PRIVATE_POPUP(index);
     },

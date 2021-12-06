@@ -50,3 +50,25 @@ exports.getMessagesRoom = async (req, res, next) => {
     console.log(e);
   }
 };
+
+exports.MarkAsRead = async (req, res) => {
+  const userUuid = req.query.userUuid;
+  
+  try {
+    const user = await models.User.findOne({ where: { uuid: userUuid } });
+
+    const messages = await models.Private.findAll({
+      where: { userId: user.id, roomId: req.params.roomId, viewed: false }
+    });
+
+    for(let i in messages){
+      messages[i].viewed = true;
+      await messages[i].save();
+    }
+
+   return res.status(200).json({message: 'Messages marquer comme lu'});
+
+  } catch (e) {
+    return res.status(500).json(e);
+  }
+};

@@ -109,6 +109,8 @@
         dense
         clearable
         hide-details
+        :autofocus="autofocus"
+        @focus="markAsRead()"
       ></v-text-field>
     </v-layout>
   </v-card>
@@ -124,7 +126,7 @@ import { VEmojiPicker } from "v-emoji-picker";
 export default {
   name: "DiscussionPrivate",
   components: { Avatar, VEmojiPicker },
-  props: ["indexChat", "to", "room", "popup"],
+  props: ["indexChat", "to", "room", "popup", "autofocus"],
   data() {
     return {
       value: "",
@@ -138,13 +140,13 @@ export default {
   //     this.INITIALIZE_MESSAGES({ index: this.indexChat, messages: response.data })
   //   }
   // },
-  mounted() {
-    socket.on("private message", (data) => {
-      if (data.roomId === this.room) {
-        this.ADD_NEW_MESSAGE({ index: this.indexChat, message: { user: data.user, message: data.message } })
-      }
-    });
-  },
+  // mounted() {
+  //   socket.on("private message", (data) => {
+  //     if (data.roomId === this.room) {
+  //       this.ADD_NEW_MESSAGE({ index: this.indexChat, message: { user: data.user, message: data.message } })
+  //     }
+  //   });
+  // },
   computed: {
     ...mapState(["user", "messenger"]),
   },
@@ -154,9 +156,13 @@ export default {
       "SET_DRAWER_CHAT",
       "SELECTED_CHAT",
       "DELETE_PRIVATE_POPUP",
-      "INITIALIZE_MESSAGES",
-      "ADD_NEW_MESSAGE"
+      "ADD_NEW_MESSAGE",
+      "RESET_MESSAGES_VIEWED"
     ]),
+    async markAsRead() {
+      await apiClient.post(`/chat/room/${this.room}?userUuid=${this.to.uuid}`);
+      this.RESET_MESSAGES_VIEWED(this.indexChat)
+    },
     windowFullscreen() {
       this.SELECTED_CHAT(this.popup.popup);
       this.SET_DRAWER_CHAT(true);
@@ -181,7 +187,10 @@ export default {
         const response = await apiClient.get(`/chat/rooms?to=${this.to.uuid}`);
         this.SET_ROOM_CHAT({ to: this.to, room: response.data[0].id });
       }
-      this.ADD_NEW_MESSAGE({ index: this.indexChat, message: { user: this.user, message: this.value } })
+      this.ADD_NEW_MESSAGE({
+        index: this.indexChat,
+        message: { user: this.user, message: this.value },
+      });
       this.value = "";
     },
   },

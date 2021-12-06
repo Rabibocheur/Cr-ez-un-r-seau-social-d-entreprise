@@ -57,10 +57,22 @@
               </v-list-item-avatar>
             </v-badge>
             <v-list-item-content>
-              <v-list-item-title class="text-left">
-                {{ chat.to.firstname }}
-                {{ chat.to.lastname }}
-              </v-list-item-title>
+               <v-list-item-title class="text-left">
+                  {{ chat.to.firstname }}
+                  {{ chat.to.lastname }}
+                </v-list-item-title>
+                <v-list-item-subtitle
+                  v-if="chat.messages[chat.messages.length - 1] != undefined"
+                  :class="chat.notView > 0 ? 'blue--text text--darken-2 font-weight-medium' : ''"
+                >
+                  {{
+                    chat.messages[chat.messages.length - 1].user.uuid ==
+                    user.uuid
+                      ? "Vous:"
+                      : ""
+                  }}
+                  {{ chat.messages[chat.messages.length - 1].message }}
+                </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -80,6 +92,7 @@
           :to="chat.to"
           :room="chat.room"
           @goBack="goBack"
+          :autofocus="true"
         />
 
         <DiscussionGlobal
@@ -125,7 +138,6 @@ export default {
         const messages = await apiClient.get(
           `/chat/room/${response.data[i].id}`
         );
-        console.log(messages.data.viewed)
         this.INITIALIZE_MESSAGES({ index: i, messages: messages.data });
       }
     });
@@ -136,7 +148,11 @@ export default {
         to: data.user,
         room: data.roomId,
       });
-      this.NOTIFICATION_PRIVATE_CHAT(data.user);
+      this.messenger.privateChat.forEach((chat, index) => {
+        if(chat.to.uuid === data.user.uuid){
+          this.ADD_NEW_MESSAGE({ index, message: { user: data.user, message: data.message } })
+        }
+      });
     });
   },
   computed: {
@@ -154,9 +170,9 @@ export default {
     ...mapMutations([
       "SET_DRAWER_CHAT",
       "SET_PRIVATE_CHAT",
-      "NOTIFICATION_PRIVATE_CHAT",
       "SELECTED_CHAT",
       "INITIALIZE_MESSAGES",
+      "ADD_NEW_MESSAGE"
     ]),
     goBack() {
       this.SELECTED_CHAT(null);

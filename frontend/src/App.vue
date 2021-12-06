@@ -15,6 +15,7 @@
       :to="messenger.privateChat[popup].to"
       :room="messenger.privateChat[popup].room"
       :popup="{ popup, index, elevationCard: '24' }"
+      :autofocus="false"
       v-show="$vuetify.breakpoint.width > 1100"
     />
 

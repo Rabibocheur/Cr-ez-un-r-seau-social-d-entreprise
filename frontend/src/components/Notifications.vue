@@ -5,8 +5,8 @@
         bottom
         :color="!notView ? 'transparent' : 'blue darken-2'"
         dot
-        offset-x="40"
-        offset-y="10"
+        offset-x="45"
+        offset-y="35"
       >
         <v-btn
           v-bind="attrs"
