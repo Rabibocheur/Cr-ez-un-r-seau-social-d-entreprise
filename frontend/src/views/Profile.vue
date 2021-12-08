@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-layout class="white d-flex column align-center">
+    <v-layout class="white d-flex column align-center mb-3" style="border-bottom: 1px solid rgba(166, 166, 166, 0.67) !important;">
       <v-card v-if="loading" flat class="profil_header">
         <v-skeleton-loader
           class="image_loader"
@@ -19,7 +19,7 @@
           style="object-fit: none; max-width: 100%"
           width="800px"
           height="400px"
-          :src="profilInfos.couverture"
+          :src="profilInfos.couverture || '../Fond-Gris.jpg'"
         />
         <v-avatar class="profil_avatar" height="150" width="150">
           <img :src="profilInfos.avatar || '../avatar.png'" />
@@ -50,11 +50,8 @@
         </v-row>
       </v-container>
     </v-layout>
-    <v-divider></v-divider>
-    <v-container class="mt-5">
       <PostForm />
       <PostsList :userUuid="this.$route.params.uuid"/>
-    </v-container>
   </div>
 </template>
 

@@ -8,6 +8,7 @@ import "vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css";
 import VueChatScroll from 'vue-chat-scroll'
 import VueCroppie from 'vue-croppie';
 import 'croppie/croppie.css'
+import './registerServiceWorker'
 
 Vue.use(VueCroppie);
 Vue.use(VueChatScroll)

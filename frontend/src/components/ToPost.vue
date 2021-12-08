@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mb-6 pa-1 rounded-lg" elevation="1">
+  <v-card class=" pa-1" style="margin: 0 !important" :class="$vuetify.breakpoint.width < 500 ? 'rounded-0' : 'rounded-lg'" :elevation="$vuetify.breakpoint.width < 500 ? '0' : '1'">
     <v-layout class="d-flex mx-3 my-1">
       <router-link :to="`/profile/${user.uuid}`" class="float-left">
         <Avatar :avatar="user.avatar" size="38" />

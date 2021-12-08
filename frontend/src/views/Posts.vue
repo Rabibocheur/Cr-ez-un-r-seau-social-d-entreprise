@@ -1,16 +1,27 @@
 <template>
-  <v-container class="d-flex mt-5" :class="$vuetify.breakpoint.width > 500 ? 'px-7' : 'pa-0'" fluid>
-    <div
-      class="card_save1 pr-5 d-flex"
-      v-if="$vuetify.breakpoint.width > 1200"
-    >
+  <v-container
+    class="d-flex"
+    :class="$vuetify.breakpoint.width > 500 ? 'px-7' : 'pa-0'"
+    fluid
+  >
+    <div class="card_save1 pr-5 d-flex" v-if="$vuetify.breakpoint.width > 1200">
       <SearchUsers />
     </div>
-    <v-container class="container_posts mt-2 pt-0 d-flex justify-center" :class="$vuetify.breakpoint.width < 500 ? 'pa-0' : ''">
+    <v-container
+      class="container_posts mt-2 pt-0 d-flex justify-center"
+      :class="$vuetify.breakpoint.width < 500 ? 'pa-0' : ''"
+    >
       <div class="container_posts-posts">
         <v-layout justify-center>
-          <v-row style="max-width: 600px">
-            <v-col cols="12" class="pa-1">
+          <v-row
+            style="max-width: 600px;margin: 0!important;"
+            :no-gutters="$vuetify.breakpoint.width < 500"
+          >
+            <v-col
+              cols="12"
+              :class="$vuetify.breakpoint.width < 500 ? 'white mt-3' : 'pa-2'"
+              :style="$vuetify.breakpoint.width < 500 ? 'padding-top: 10px;margin-top: -18px !important;' : ''"
+            >
               <ToPost />
               <PostForm />
             </v-col>
@@ -20,9 +31,7 @@
       </div>
     </v-container>
     <div class="card_save1" v-if="$vuetify.breakpoint.width > 800">
-      <DiscussionGlobal
-        class="card_save2"
-      />
+      <DiscussionGlobal class="card_save2" />
     </div>
   </v-container>
 </template>
@@ -69,10 +78,10 @@ export default {
   position: sticky;
   top: 88px;
   max-height: 600px;
-   max-width: 360px
+  max-width: 360px;
 }
 .card_save2 {
-    border: 1px solid #0000002f !important;
+  border: 1px solid #0000002f !important;
   height: 600px;
   width: 360px;
 }

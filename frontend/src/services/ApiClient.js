@@ -3,7 +3,7 @@ import store from "../store/index";
 const axios = require("axios");
 
 const instance = axios.create({
-  baseURL: "/api",
+  baseURL: "https://groupomania-p7-back.herokuapp.com/api",
 });
 
 class ApiClient {

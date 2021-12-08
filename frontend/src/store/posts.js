@@ -35,7 +35,7 @@ export default {
       state.lastPage = false;
     },
     NEXT_PAGE(state) {
-      state.page ++;
+      state.page++;
     },
     LAST_PAGE_REACHED(state) {
       state.lastPage = true;
@@ -194,11 +194,13 @@ export default {
         dispatch("modifyPost");
       }
     },
-    createPost: function({ state, commit }) {
-      apiClient.post(`/post`, state.body).then((response) => {
-        commit("ADD_NEW_POST", response.data);
-        commit("EMPTY_POST_FORM");
-      });
+    createPost: async function({ state, commit, dispatch }) {
+      commit("SET_STATUS", 'loading')
+      const response = await apiClient.post(`/post`, state.body);
+      commit("ADD_NEW_POST", response.data);
+      commit("SET_STATUS", '')
+      commit("EMPTY_POST_FORM");
+      dispatch("closeDialogPost", { status: null, dialog: false })
     },
     modifyPost: function({ state, commit }) {
       apiClient
@@ -214,7 +216,7 @@ export default {
     },
     getPosts: function({ commit, state }, userUuid = "") {
       commit("LOADING_POST", true);
-      if(userUuid != "") userUuid = `&user=${userUuid}`
+      if (userUuid != "") userUuid = `&user=${userUuid}`;
       return new Promise(() => {
         apiClient
           .get(`/post?page=${state.page}${userUuid}`)

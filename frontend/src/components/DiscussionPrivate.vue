@@ -178,7 +178,7 @@ export default {
       this.value += emoji.data;
     },
     async sendMessage() {
-      socket.emit("private message", {
+      await socket.emit("private message", {
         sender: this.user.uuid,
         receiver: this.to.uuid,
         message: this.value,

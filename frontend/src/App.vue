@@ -53,6 +53,12 @@ export default {
 body {
   background-color: #f0f2f5;
 }
+@media screen and (max-width: 500px) {
+  #app,
+  body {
+    background-color: #bec2c987;
+  }
+}
 a {
   text-decoration: none;
 }

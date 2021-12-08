@@ -1,6 +1,6 @@
 <template>
-  <v-row justify="center">
-    <v-dialog v-model="dialog"  max-width="500px">
+  <v-row justify="center" style="margin: 0!important;">
+    <v-dialog v-model="dialog" max-width="500px">
       <v-card class="pa-3 pt-0">
         <v-toolbar height="80" flat color="white">
           <v-toolbar-title class="text-center title" style="width: 100%">
@@ -64,9 +64,16 @@
         </div>
 
         <div
-          class="add_img_post d-flex flex-wrap align-center justify-space-between"
+          class="add_img_post d-flex flex-wrap align-center"
+          :class="
+            $vuetify.breakpoint.width > 500
+              ? 'justify-space-between'
+              : 'justify-center'
+          "
         >
-          <span class="">Ajouter à votre publication</span>
+          <span v-if="$vuetify.breakpoint.width > 500" class=""
+            >Ajouter à votre publication</span
+          >
           <v-btn
             depressed
             class="my-2 transparent darken-1 gray--text"
@@ -93,8 +100,16 @@
           :disabled="isAddButtonDisabled"
           @click="sendPost"
         >
-          <v-icon left>mdi-send</v-icon>
-          <span>Publier</span>
+          <span v-if="status == 'loading'">
+            <v-progress-circular
+              indeterminate
+              color="white"
+            ></v-progress-circular>
+          </span>
+          <div v-else>
+            <v-icon left>mdi-send</v-icon>
+            <span>Publier</span>
+          </div>
         </v-btn>
       </v-card>
     </v-dialog>
@@ -111,7 +126,7 @@ export default {
   props: ["titleForm"],
   data: () => ({}),
   computed: {
-    ...mapState(["user", "posts"]),
+    ...mapState(["user", "status", "posts"]),
     isAddButtonDisabled() {
       return !(this.posts.body.title || this.posts.urlsContent.length > 0);
     },
@@ -126,10 +141,7 @@ export default {
   },
   methods: {
     ...mapActions(["deleteOneFile", "sendThePost", "closeDialogPost"]),
-    ...mapMutations([
-      "ADD_BODY_FILES",
-      "DELETE_ALL_FILES",
-    ]),
+    ...mapMutations(["ADD_BODY_FILES", "DELETE_ALL_FILES"]),
     closePostDialog() {
       this.closeDialogPost({ status: null, dialog: false });
     },
@@ -152,6 +164,14 @@ export default {
 };
 </script>
 
+<style>
+@media screen and (max-width: 500px) {
+  .v-dialog {
+    margin: 0 !important;
+  }
+}
+</style>
+
 <style lang="scss" scoped>
 .to_post {
   width: 100%;
@@ -170,8 +190,6 @@ export default {
   padding: 5px;
   border-radius: 3px;
   position: relative;
-}
-.bloc__image--close {
 }
 .bloc__image__containt {
   max-width: 500px;

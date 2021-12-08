@@ -1,5 +1,10 @@
 <template>
-  <v-card class="mt-1 py-1 rounded-lg" elevation="1">
+  <v-card
+    class="mt-1 py-1"
+    :class="$vuetify.breakpoint.width < 500 ? 'rounded-0' : 'rounded-lg'"
+    :elevation="$vuetify.breakpoint.width < 500 ? '0' : '1'"
+    style="margin: 0 !important"
+  >
     <v-card-title class="mx-3 my-1 pa-0">
       <router-link :to="`/profile/${post.user.uuid}`">
         <Avatar :avatar="post.user.avatar" size="38" />
@@ -22,7 +27,7 @@
       <v-menu bottom left v-if="post.user.uuid === user.uuid || user.isAdmin">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on">
-            <v-icon >mdi-dots-horizontal</v-icon>
+            <v-icon>mdi-dots-horizontal</v-icon>
           </v-btn>
         </template>
         <v-list>
@@ -45,7 +50,7 @@
     <v-card-text
       v-if="post.title != ''"
       style="white-space:pre; width: 100%"
-      class="mx-3 my-1 pa-0 font-weight-regular title black--text"
+      class="pa-0 font-weight-regular title black--text"
     >
       {{ post.title }}
     </v-card-text>
@@ -75,7 +80,6 @@
     <v-divider></v-divider>
 
     <Comment :likes="post.likes" :postId="post.id" />
-    
   </v-card>
 </template>
 

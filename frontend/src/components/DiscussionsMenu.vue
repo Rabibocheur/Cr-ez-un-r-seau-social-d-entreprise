@@ -12,7 +12,7 @@
         v-bind="attrs"
         v-on="on"
         icon
-        class="mx-1 grey lighten-3"
+        class="transparent mx-1 grey lighten-3"
         height="40px"
         width="40px"
         @click="setDrawerConv(); SET_VIEWED()"

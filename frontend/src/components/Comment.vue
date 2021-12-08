@@ -8,7 +8,7 @@
     >
       <div
         v-if="likesCount > 0"
-        class="users_likes font-weight-light d-flex align-center"
+        class="users_likes font-weight-light d-flex align-center text-md-body-1 text-sm-body-1  text-body-2"
         @click="dialog = true"
       >
         <v-icon x-small class="mr-1 icon-like">
@@ -56,13 +56,13 @@
         <v-icon class="mr-1" v-else :style="`${like ? 'color: blue' : ''}`"
           >mdi-thumb-up</v-icon
         >
-        <span class="mr-2" :style="`${like ? 'color: blue' : ''}`">J'aime</span>
+        <span class="mr-2  text-md-body-1 text-sm-body-1  text-body-2" :style="`${like ? 'color: blue' : ''}`">J'aime</span>
       </v-btn>
       <v-btn depressed class="white" @click="focusComment" style="width: 50%">
-        <v-icon class="mr-1">
+        <v-icon  class="mr-1">
           mdi-message-outline
         </v-icon>
-        <span>Commenter</span>
+        <span class="text-md-body-1 text-sm-body-1  text-body-2">Commenter</span>
       </v-btn>
     </div>
     <v-layout
@@ -71,7 +71,7 @@
       style="border-top: 1px solid rgba(0, 0, 0, 0.2)"
     >
       <div
-        class="comment_link grey--text text--darken-2 text-md-body-1 text-sm-body-1 text-caption font-weight-medium"
+        class="comment_link grey--text text--darken-2 text-md-body-1 text-sm-body-1  text-body-2 font-weight-medium"
         v-if="count > 1 && !showAllComments"
         @click="getAllComments"
       >
@@ -81,7 +81,7 @@
         <span v-else>Afficher {{ count - 1 }} autre commentaire</span>
       </div>
       <div
-        class="comment_link grey--text text--darken-2 text-md-body-1 text-sm-body-1 text-caption font-weight-medium"
+        class="comment_link grey--text text--darken-2 text-md-body-1 text-sm-body-1 text-body-2 font-weight-medium"
         v-if="count > 1 && showAllComments"
         @click="getOneComment"
       >
