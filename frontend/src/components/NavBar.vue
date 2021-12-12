@@ -21,7 +21,10 @@
         v-if="$vuetify.breakpoint.width < 500"
       >
         <img src="/icon-left-font.png" alt="" height="27" />
-        <v-app-bar-nav-icon x-large @click="setDrawerSearch"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon
+          x-large
+          @click="setDrawerSearch"
+        ></v-app-bar-nav-icon>
       </div>
 
       <div class="d-flex" style="width: 100%; height: 100%">
@@ -39,7 +42,9 @@
             class="btn-home rounded-0 light"
             height="100%"
           >
-            <v-icon style="font-size: 30px" color="#7b7070" class="icon-home">mdi-home</v-icon>
+            <v-icon style="font-size: 30px" color="#7b7070" class="icon-home"
+              >mdi-home</v-icon
+            >
           </v-btn>
 
           <router-link to="/" v-if="$vuetify.breakpoint.width > 500">
@@ -102,9 +107,7 @@
             :to="`/profile/${user.uuid}`"
             class="btn-user mr-5 pa-2 py-6 d-flex align-center text-capitalize rounded-pill"
           >
-            <v-avatar size="28">
-              <img :src="user.avatar || '../avatar.png'" />
-            </v-avatar>
+            <Avatar :avatar="user.avatar" size="30"/>
             <span class="black--text font-weight-medium ml-2 text-body-1">
               {{ user.firstname }}
             </span>
@@ -123,10 +126,14 @@
                   height="40px"
                   width="40px"
                 >
-                  <v-icon large color="black" v-if="$vuetify.breakpoint.width > 500"> mdi-menu-down </v-icon>
-                  <v-avatar v-else size="28">
-                    <img :src="user.avatar || '../avatar.png'" />
-                  </v-avatar>
+                  <v-icon
+                    large
+                    color="black"
+                    v-if="$vuetify.breakpoint.width > 500"
+                  >
+                    mdi-menu-down
+                  </v-icon>
+                  <Avatar v-else :avatar="user.avatar" size="28"/>
                 </v-btn>
               </template>
               <v-card width="300" class="px-2">
@@ -158,14 +165,13 @@
                       <v-list-item-title>Voir l'accueil</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
-                  <v-list-item>
+                  <v-list-item @click="openSettings()">
                     <v-list-item-avatar>
                       <v-icon>mdi-cog</v-icon>
                     </v-list-item-avatar>
                     <v-list-item-content>
                       <v-list-item-title>Mes paramètres</v-list-item-title>
                     </v-list-item-content>
-                    <v-icon large style="width: 10px">mdi-chevron-right</v-icon>
                   </v-list-item>
                   <v-list-item @click="logout()">
                     <v-list-item-avatar>
@@ -184,6 +190,7 @@
     </v-app-bar>
     <SearchUsersDrawer />
     <DiscussionDrawer />
+    <SettingsUser />
   </div>
 </template>
 
@@ -192,15 +199,19 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import SearchUsersDrawer from "./SearchUsersDrawer";
 import DiscussionDrawer from "./DiscussionDrawer";
 import DiscussionsMenu from "./DiscussionsMenu";
+import SettingsUser from "./SettingsUser";
 import Notifications from "./Notifications";
+import Avatar from "./Avatar";
 
 export default {
   name: "NavBar",
   components: {
     SearchUsersDrawer,
-    DiscussionDrawer,
+    DiscussionDrawer, 
     DiscussionsMenu,
+    SettingsUser,
     Notifications,
+    Avatar
   },
   data() {
     return {
@@ -220,6 +231,7 @@ export default {
       "SET_DRAWER_SEARCH",
       "SET_DRAWER_CHAT",
       "SET_SEARCH_USER",
+      "SET_DRAWER_SETTINGS"
     ]),
     setDrawerSearch() {
       this.SET_DRAWER_SEARCH(true);
@@ -227,12 +239,15 @@ export default {
     setDrawerConv() {
       this.SET_DRAWER_CHAT(true);
     },
+    openSettings(){
+      this.SET_DRAWER_SETTINGS(true);
+    }
   },
   computed: {
     ...mapState(["user", "search"]),
     setSearch: {
-      get(){
-        return this.search
+      get() {
+        return this.search;
       },
       set(value) {
         this.SET_SEARCH_USER(value);

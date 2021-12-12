@@ -128,7 +128,7 @@ export default {
     },
     editPost(postId) {
       this.MODE_MODIFY_POST({
-        urls: this.post.content,
+        urls: [...this.post.content],
         title: this.post.title,
         postId,
       });

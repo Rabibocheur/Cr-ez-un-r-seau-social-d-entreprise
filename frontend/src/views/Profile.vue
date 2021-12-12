@@ -16,13 +16,13 @@
       <v-card v-if="!loading" flat class="profil_header">
         <img
           class="grey lighten-4 rounded-b-lg"
-          style="object-fit: none; max-width: 100%"
+          style="object-fit: unset; max-width: 100%"
           width="800px"
           height="400px"
           :src="profilInfos.couverture || '../Fond-Gris.jpg'"
         />
-        <v-avatar style="object-fit: cover" class="profil_avatar" height="150" width="150">
-          <img :src="profilInfos.avatar || '../avatar.png'" />
+        <v-avatar class="profil_avatar" height="150" width="150">
+          <img :src="profilInfos.avatar || '../avatar.png'" style="object-fit: cover" />
         </v-avatar>
       </v-card>
       <v-container>
@@ -44,7 +44,7 @@
           justify="center"
         >
           <EditProfile @reload="getProfile()" />
-          <v-btn depressed class="ml-5">
+          <v-btn depressed class="ml-5" @click="openSettings()">
             <v-icon>mdi-cog</v-icon>
           </v-btn>
         </v-row>
@@ -89,8 +89,11 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(["SET_UUID_PROFIL"]),
+    ...mapMutations(["SET_UUID_PROFIL", "SET_DRAWER_SETTINGS"]),
     ...mapActions(["initializePosts"]),
+      openSettings(){
+      this.SET_DRAWER_SETTINGS(true);
+    },
     getProfile: async function() {
       this.loading = true;
       const self = this;

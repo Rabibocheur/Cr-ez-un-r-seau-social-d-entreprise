@@ -100,29 +100,6 @@
                       </v-list-item-avatar>
                       <v-list-item-title>Ouvrir dans le chat</v-list-item-title>
                     </v-list-item>
-                    <v-list-group :value="true">
-                      <template v-slot:activator>
-                        <h4>Un problème ?</h4>
-                      </template>
-                      <v-list max-width="100%">
-                        <v-list-item link>
-                          <v-list-item-avatar>
-                            <v-icon>mdi-comment-alert</v-icon>
-                          </v-list-item-avatar>
-                          <v-list-item-title
-                            >Envoyer un avertissement privé</v-list-item-title
-                          >
-                        </v-list-item>
-                        <v-list-item link>
-                          <v-list-item-avatar>
-                            <v-icon>mdi-alert</v-icon>
-                          </v-list-item-avatar>
-                          <v-list-item-title
-                            >Signaler un comportement</v-list-item-title
-                          >
-                        </v-list-item>
-                      </v-list>
-                    </v-list-group>
                   </v-list>
                 </v-menu>
               </div>

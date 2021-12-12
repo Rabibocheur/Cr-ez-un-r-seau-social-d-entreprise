@@ -17,7 +17,7 @@ self.addEventListener("push", (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
   event.waitUntil(
-    openUrl('http://127.0.0.1:8080')
+    openUrl('https://fbequipement-social.herokuapp.com/')
   )
 })
 

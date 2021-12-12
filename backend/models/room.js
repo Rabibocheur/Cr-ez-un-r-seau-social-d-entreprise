@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(User, { foreignKey: 'userId1', as: 'user1' })
       this.belongsTo(User, { foreignKey: 'userId2', as: 'user2' })
     }
+    toJSON(){
+      return { ...this.get(), userId1: undefined, userId2: undefined}
+    }
   };
   Room.init({
     userId1: {

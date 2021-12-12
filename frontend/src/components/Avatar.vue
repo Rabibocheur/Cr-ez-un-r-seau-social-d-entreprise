@@ -1,6 +1,6 @@
 <template>
   <v-avatar :size="size">
-    <img :src="avatar || '../avatar.png'" />
+    <img :src="avatar || '../avatar.png'" style="object-fit:cover"/>
   </v-avatar>
 </template>
 

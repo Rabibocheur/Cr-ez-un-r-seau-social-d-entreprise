@@ -10,12 +10,16 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     drawerSearch: false,
+    settings: "",
     search: "",
     status: "",
     snackbar: false,
     user: JSON.parse(localStorage.getItem("user")),
   },
   mutations: {
+    SET_DRAWER_SETTINGS: function(state, value){
+      state.settings = value;
+    },
     SET_SEARCH_USER: function (state, value) {
       state.search = value;
     },

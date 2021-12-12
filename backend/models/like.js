@@ -13,7 +13,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(User, { foreignKey: 'userId', as: 'user' })
       this.belongsTo(Post, { foreignKey: 'postId', as: 'post' })
     }
-
+    toJSON(){
+      return { ...this.get(), userId: undefined}
+    }
   };
   Like.init({
     userId: DataTypes.INTEGER,
