@@ -49,8 +49,8 @@
 
     <v-card-text
       v-if="post.title != ''"
-      style="white-space:pre; width: 100%"
-      class="pa-0 font-weight-regular title black--text"
+      style="white-space: pre-line; width: 100%"
+      class="px-3 py-0 font-weight-regular title black--text"
     >
       {{ post.title }}
     </v-card-text>

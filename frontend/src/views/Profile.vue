@@ -21,7 +21,7 @@
           height="400px"
           :src="profilInfos.couverture || '../Fond-Gris.jpg'"
         />
-        <v-avatar class="profil_avatar" height="150" width="150">
+        <v-avatar style="object-fit: cover" class="profil_avatar" height="150" width="150">
           <img :src="profilInfos.avatar || '../avatar.png'" />
         </v-avatar>
       </v-card>

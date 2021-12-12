@@ -16,22 +16,22 @@ const store = new Vuex.Store({
     user: JSON.parse(localStorage.getItem("user")),
   },
   mutations: {
-    SET_SEARCH_USER: function(state, value) {
+    SET_SEARCH_USER: function (state, value) {
       state.search = value;
     },
-    SET_DRAWER_SEARCH: function(state, value) {
+    SET_DRAWER_SEARCH: function (state, value) {
       state.drawerSearch = value;
     },
-    SET_STATUS: function(state, status) {
+    SET_STATUS: function (state, status) {
       state.status = status;
     },
-    SET_SNACKBAR: function(state, snackbar) {
+    SET_SNACKBAR: function (state, snackbar) {
       state.snackbar = snackbar;
     },
-    LOG_USER: function(state) {
+    LOG_USER: function (state) {
       state.user = JSON.parse(localStorage.getItem("user"));
     },
-    LOGOUT_USER: function(state) {
+    LOGOUT_USER: function (state) {
       localStorage.clear();
       state.user = {};
     },
@@ -52,7 +52,7 @@ const store = new Vuex.Store({
   },
   modules: {
     posts,
-    messenger
+    messenger,
   },
 });
 

@@ -1,60 +1,67 @@
 <template>
-  <v-card class="card_search-users" elevation="0">
-    <v-list class="card_search-users--list px-1 pt-0">
+  <v-card
+    class="card_search-users"
+    elevation="0"
+    style="transition: all 0.5s"
+    :style="loading ? 'opacity: 0' : 'opacity: 1'"
+  >
+    <v-list class="card_search-users--title px-1 pt-0">
       <v-list-item-title class="text-h6 grey--text text--darken-1">
         Membres entreprise
       </v-list-item-title>
     </v-list>
     <perfect-scrollbar style="max-height: 550px">
-      <v-expansion-panels>
-        <v-expansion-panel
-          v-for="(user, i) in usersList"
+      <v-list class="transparent">
+        <v-menu
+          v-for="(users, i) in usersList"
           :key="i"
-          class="card_search-users--list users-list--hover"
-          :class="
-            !user.isConnected ? 'users-list--connect' : 'users-list--disconnect'
-          "
+          offset-y
+          :close-on-content-click="closeOnMenuClick"
+          min-width="310px"
         >
-          <v-expansion-panel-header class="pa-2">
-            <v-list-item class="pl-0" style="max-width: 250px">
+          <template v-slot:activator="{ on, attrs }">
+            <v-list-item
+              :style="users.isConnected ? 'opacity:1' : 'opacity:0.5'"
+              v-bind="attrs"
+              v-on="on"
+              v-show="users.uuid != user.uuid"
+              class="card_search-users--list pl-8 rounded-lg"
+              style="max-width: 90%"
+            >
               <v-badge
                 bottom
-                :color="user.isConnected ? 'green' : 'transparent'"
+                :color="users.isConnected ? 'green' : 'transparent'"
                 dot
                 offset-x="22"
                 offset-y="22"
               >
                 <v-list-item-avatar class="ml-0" size="36">
-                  <img :src="user.avatar || '../avatar.png'" />
+                  <img :src="users.avatar || '../avatar.png'" />
                 </v-list-item-avatar>
               </v-badge>
-              <v-list-item-content>
+              <v-list-item-content style="max-width: 85%">
                 <v-list-item-title class="font-weight-medium text-body-1">{{
-                  user.firstname + " " + user.lastname
+                  users.firstname + " " + users.lastname
                 }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-list-item link route :to="'/profile/' + user.uuid">
+          </template>
+          <v-list>
+            <v-list-item link route :to="'/profile/' + users.uuid">
               <v-list-item-avatar>
                 <v-icon>mdi-account-circle</v-icon>
               </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title>Voir le profil</v-list-item-title>
-              </v-list-item-content>
+              <v-list-item-title>Voir le profil</v-list-item-title>
             </v-list-item>
-            <v-list-item link @click="setUserConv(user, i)">
+            <v-list-item link @click="setUserConv(users)">
               <v-list-item-avatar>
                 <v-icon>mdi-facebook-messenger</v-icon>
               </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title>Discuter</v-list-item-title>
-              </v-list-item-content>
+              <v-list-item-title>Ouvrir dans le chat</v-list-item-title>
             </v-list-item>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
+          </v-list>
+        </v-menu>
+      </v-list>
     </perfect-scrollbar>
   </v-card>
 </template>
@@ -68,7 +75,9 @@ export default {
   name: "SearchUsers",
   data: () => {
     return {
+      loading: false,
       usersList: [],
+      closeOnMenuClick: false,
     };
   },
   watch: {
@@ -116,13 +125,15 @@ export default {
             return;
           }
           this.ADD_PRIVATE_POPUP(index);
-           this.SET_DRAWER_SEARCH(false);
+          this.SET_DRAWER_SEARCH(false);
         }
       });
     },
     searchUsers(search = "") {
+      this.loading = true;
       apiClient.get(`/user?search=${search}`).then((response) => {
         this.usersList = response.data;
+        this.loading = false;
       });
     },
     userConnect(payload, value) {
@@ -137,14 +148,17 @@ export default {
 </script>
 
 <style lang="scss">
+.v-list-item__icon {
+  display: none !important;
+}
 .card_search-users {
   background-color: transparent !important;
   overflow: hidden;
   min-width: 360px;
 }
-.card_search-users--list {
+.card_search-users--title {
   background-color: transparent !important;
-  max-width: 300px !important;
+  max-width: 250px !important;
 }
 .users-list--connect {
   filter: grayscale(80%);
@@ -154,5 +168,13 @@ export default {
 }
 .v-expansion-panel::before {
   box-shadow: none !important;
+}
+.card_search-users--list {
+  cursor: pointer;
+  position: relative;
+  transition: opacity 0.2s
+}
+.card_search-users--list:hover {
+  background-color: rgba(185, 185, 185, 0.219);
 }
 </style>

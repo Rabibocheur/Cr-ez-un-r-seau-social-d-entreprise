@@ -1,8 +1,8 @@
 <template>
   <v-layout justify-center>
     <v-row
-      style="max-width: 600px;margin: 0!important;"
-     :no-gutters="$vuetify.breakpoint.width < 500"
+      style="max-width: 600px; margin: 0 !important"
+      :no-gutters="$vuetify.breakpoint.width < 500"
     >
       <v-col
         cols="12"
@@ -12,20 +12,20 @@
       >
         <Post :post="post" />
       </v-col>
-      <!-- <v-col cols="12" class="pa-1" v-if="posts.loading">
+      <v-col cols="12" class="pa-1" v-if="posts.loading">
         <v-skeleton-loader
           elevation="1"
-          class="mt-1"
+          class="mt-1 rounded-lg"
           type="list-item-avatar, card-heading, image, table-heading"
         ></v-skeleton-loader>
       </v-col>
       <v-col cols="12" class="pa-1" v-if="posts.loading">
         <v-skeleton-loader
           elevation="1"
-          class="mt-1"
+          class="mt-1 rounded-lg"
           type="list-item-avatar, card-heading, image, table-heading"
         ></v-skeleton-loader>
-      </v-col> -->
+      </v-col>
     </v-row>
   </v-layout>
 </template>
@@ -33,6 +33,11 @@
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
 import Post from "../components/Post";
+
+window.addEventListener("load", function () {
+  console.log('chargement terminé')
+});
+
 
 export default {
   name: "PostList",

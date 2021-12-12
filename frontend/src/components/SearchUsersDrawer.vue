@@ -1,7 +1,7 @@
 <template>
-  <v-navigation-drawer v-model="drawer" width="370px" fixed left temporary>
-    <div class="d-flex align-center">
-      <v-btn icon @click="goBack">
+  <v-navigation-drawer v-model="drawer" :width="$vuetify.breakpoint.width < 500 ? '100%' : '370px'" fixed left temporary>
+    <div class="d-flex align-center pa-3">
+      <v-btn icon @click="goBack" color="black" fab>
         <v-icon>
           mdi-arrow-left
         </v-icon>
@@ -20,7 +20,7 @@
       ></v-text-field>
     </div>
     <v-divider class="my-3"></v-divider>
-    <SearchUsers />
+    <SearchUsers class="pa-3"/>
   </v-navigation-drawer>
 </template>
 

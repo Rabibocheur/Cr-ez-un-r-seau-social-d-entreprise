@@ -16,7 +16,8 @@
           height="40px"
           width="40px"
         >
-          <v-icon color="black">mdi-bell-outline</v-icon>
+          <v-icon v-if="$vuetify.breakpoint.width < 500" color="black">mdi-bell-outline</v-icon>
+          <v-icon v-else color="black">mdi-bell</v-icon>
         </v-btn>
       </v-badge>
     </template>

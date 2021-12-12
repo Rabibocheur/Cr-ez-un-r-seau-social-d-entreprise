@@ -1,7 +1,13 @@
 <template>
   <v-app>
     <NavBar v-if="route != 'Login'" />
-    <v-main>
+    <v-main
+      :style="
+        route == 'Login' && $vuetify.breakpoint.width < 500
+          ? 'background-color: white'
+          : ''
+      "
+    >
       <router-view />
     </v-main>
 
@@ -54,8 +60,7 @@ body {
   background-color: #f0f2f5;
 }
 @media screen and (max-width: 500px) {
-  #app,
-  body {
+  #app, body {
     background-color: #bec2c987;
   }
 }

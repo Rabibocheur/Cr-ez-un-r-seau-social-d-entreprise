@@ -1,6 +1,20 @@
 const path = require("path");
 const models = require("./models");
 const Sequelize = require("sequelize");
+const webpush = require("web-push");
+
+const vapidKeys = {
+  publicKey:
+    "BMdqQbJomMhyKKAj4FefuaE9s9lCyJDiGWftKCXzb1eUgFd4IJOZyLE4ufzdJokjFlG1D0blkKG3IA72ARH8HlQ",
+  privateKey: "Go2THsApXek4xY6klw1EwhWKRdSOC0ORcbnzoCZxjDI",
+};
+
+webpush.setVapidDetails(
+  "mailto:example@yourdomain.org",
+  vapidKeys.publicKey,
+  vapidKeys.privateKey
+);
+
 
 const express = require("express");
 const app = express();
@@ -35,6 +49,23 @@ app.use("/api/post", postRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/notification", notificationRoutes);
 
+const normalizePort = (val) => {
+  const port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    return val;
+  }
+  if (port >= 0) {
+    return port;
+  }
+  return false;
+};
+
+const port = normalizePort(process.env.PORT || "3000");
+
+server.listen(port, () => {
+  console.log("Listening on " + port);
+});
 
 // Socket
 const io = require("socket.io")(server, {
@@ -95,20 +126,16 @@ io.on("connection", (socket) => {
 
       let room = await models.Room.findOne({
         where: {
-          userId1: {
-            [Sequelize.Op.or]: [userSender.id, userReceiver.id]
-          },
-          userId2: {
-            [Sequelize.Op.or]: [userSender.id, userReceiver.id]
-          }
+          userId1: { [Sequelize.Op.or]: [userReceiver.id, userSender.id] },
+          userId2: { [Sequelize.Op.or]: [userSender.id, userReceiver.id] },
         },
-      })
+      });
 
-      if(!room){
+      if (!room) {
         room = await models.Room.create({
           userId1: userSender.id,
-          userId2: userReceiver.id
-        })
+          userId2: userReceiver.id,
+        });
       }
 
       const newMessage = await models.Private.create({
@@ -124,6 +151,26 @@ io.on("connection", (socket) => {
 
       const socketId = users[receiver];
       io.to(socketId).emit("private message", messageFind);
+
+      // Push Notification
+      const pushSubscriptions = await models.PushNotification.findAll({
+        where: { userId: userReceiver.id },
+      });
+      for(let i in pushSubscriptions){
+        const subscription = {
+          endpoint: pushSubscriptions[i].endpoint,
+          keys: {
+            auth: pushSubscriptions[i].auth,
+            p256dh: pushSubscriptions[i].p256dh,
+          },
+        };
+        const payload = JSON.stringify({
+          title: `Message de : ${userSender.firstname} ${userSender.lastname}`,
+          icon: userSender.avatar,
+          message: message,
+        });
+        webpush.sendNotification(subscription, payload);
+      }
 
     } catch (error) {
       console.log(error);
@@ -142,22 +189,4 @@ io.on("connection", (socket) => {
       console.log(e);
     }
   });
-});
-
-const normalizePort = (val) => {
-  const port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    return val;
-  }
-  if (port >= 0) {
-    return port;
-  }
-  return false;
-};
-
-const port = normalizePort(process.env.PORT || "3000");
-
-server.listen(port, () => {
-  console.log("Listening on " + port);
 });

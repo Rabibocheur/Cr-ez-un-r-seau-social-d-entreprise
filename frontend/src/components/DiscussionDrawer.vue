@@ -12,11 +12,9 @@
         v-show="$vuetify.breakpoint.width > 620 || messenger.selected == null"
         style="width: 100%"
       >
-        <div class="d-flex justify-space-between align-center py-2">
-          <h1 style="height: 10%; max-height: 70px" class="px-5">
-            Discussions
-          </h1>
-          <v-btn text @click="setDrawerConv" fab>
+        <div class="d-flex justify-space-between align-center py-2 px-5">
+          <h1 style="height: 10%; max-height: 70px">Discussions</h1>
+          <v-btn icon @click="setDrawerConv" fab>
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </div>
@@ -30,12 +28,12 @@
           >
             <v-badge :color="'transparent'" offset-x="25" offset-y="40">
               <v-list-item-avatar size="56">
-                <v-icon large>mdi-account-group</v-icon>
+                <v-icon x-large>mdi-account-group</v-icon>
               </v-list-item-avatar>
             </v-badge>
             <v-list-item-content>
               <v-list-item-title class="text-left">
-                Global
+                Tout le monde
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
@@ -57,22 +55,25 @@
               </v-list-item-avatar>
             </v-badge>
             <v-list-item-content>
-               <v-list-item-title class="text-left">
-                  {{ chat.to.firstname }}
-                  {{ chat.to.lastname }}
-                </v-list-item-title>
-                <v-list-item-subtitle
-                  v-if="chat.messages[chat.messages.length - 1] != undefined"
-                  :class="chat.notView > 0 ? 'blue--text text--darken-2 font-weight-medium' : ''"
-                >
-                  {{
-                    chat.messages[chat.messages.length - 1].user.uuid ==
-                    user.uuid
-                      ? "Vous:"
-                      : ""
-                  }}
-                  {{ chat.messages[chat.messages.length - 1].message }}
-                </v-list-item-subtitle>
+              <v-list-item-title class="text-left">
+                {{ chat.to.firstname }}
+                {{ chat.to.lastname }}
+              </v-list-item-title>
+              <v-list-item-subtitle
+                v-if="chat.messages[chat.messages.length - 1] != undefined"
+                :class="
+                  chat.notView > 0
+                    ? 'blue--text text--darken-2 font-weight-medium'
+                    : ''
+                "
+              >
+                {{
+                  chat.messages[chat.messages.length - 1].user.uuid == user.uuid
+                    ? "Vous:"
+                    : ""
+                }}
+                {{ chat.messages[chat.messages.length - 1].message }}
+              </v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -93,17 +94,20 @@
           :room="chat.room"
           @goBack="goBack"
           :autofocus="true"
+          :isClose="$vuetify.breakpoint.width < 620 ? true : false"
         />
 
         <DiscussionGlobal
-        style="width: 100%"
+          style="width: 100%"
           @goBack="goBack"
-          v-if="$vuetify.breakpoint.width < 1100 && messenger.selected == -1"
+          :isClose="$vuetify.breakpoint.width < 620 ? true : false"
+          v-if="$vuetify.breakpoint.width < 1100"
+          v-show="messenger.selected == -1"
         />
       </div>
       <DiscussionGlobal
         v-if="$vuetify.breakpoint.width > 1100"
-        style="max-width: 400px; border-left: 1px solid #00000042 !important;"
+        style="max-width: 400px; border-left: 1px solid #00000042 !important"
         class="rounded-0"
       />
     </v-card>
@@ -149,8 +153,11 @@ export default {
         room: data.roomId,
       });
       this.messenger.privateChat.forEach((chat, index) => {
-        if(chat.to.uuid === data.user.uuid){
-          this.ADD_NEW_MESSAGE({ index, message: { user: data.user, message: data.message } })
+        if (chat.to.uuid === data.user.uuid) {
+          this.ADD_NEW_MESSAGE({
+            index,
+            message: { user: data.user, message: data.message },
+          });
         }
       });
     });
@@ -172,7 +179,7 @@ export default {
       "SET_PRIVATE_CHAT",
       "SELECTED_CHAT",
       "INITIALIZE_MESSAGES",
-      "ADD_NEW_MESSAGE"
+      "ADD_NEW_MESSAGE",
     ]),
     goBack() {
       this.SELECTED_CHAT(null);

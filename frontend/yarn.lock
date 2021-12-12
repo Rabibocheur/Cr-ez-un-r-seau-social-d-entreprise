@@ -1648,14 +1648,14 @@
     webpack "^4.0.0"
     yorkie "^2.0.0"
 
-"@vue/cli-plugin-pwa@^5.0.0-rc.1":
-  version "5.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-pwa/-/cli-plugin-pwa-5.0.0-rc.1.tgz#0cdb9d582091579e70aebd015726578b05404cdb"
-  integrity sha512-SJweD2lK7Fd5ylZIvb0dsYW6UWM7IyZUM4nctXDw15unCByqm0eO4moIlj95OiNiudeuiBuyHuaHqErrvIlfqQ==
+"@vue/cli-plugin-pwa@^5.0.0-rc.0":
+  version "5.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/@vue/cli-plugin-pwa/-/cli-plugin-pwa-5.0.0-rc.0.tgz#84de5365403ffa9760bf123da67e0d4b755bc6ce"
+  integrity sha512-0GWbaQRpArD9o13FPsjNCusrbjXfNj67PlTCjPwx4/pPkZpMaP4EuzbFLkeO+8h5cU8fV4qIp2vY87hbCqr6hA==
   dependencies:
-    "@vue/cli-shared-utils" "^5.0.0-rc.1"
+    "@vue/cli-shared-utils" "^5.0.0-rc.0"
     html-webpack-plugin "^5.1.0"
-    webpack "^5.54.0"
+    webpack "^5.22.0"
     workbox-webpack-plugin "^6.1.0"
 
 "@vue/cli-plugin-router@^4.5.13", "@vue/cli-plugin-router@~4.5.0":
@@ -1751,7 +1751,7 @@
     semver "^6.1.0"
     strip-ansi "^6.0.0"
 
-"@vue/cli-shared-utils@^5.0.0-rc.1":
+"@vue/cli-shared-utils@^5.0.0-rc.0":
   version "5.0.0-rc.1"
   resolved "https://registry.yarnpkg.com/@vue/cli-shared-utils/-/cli-shared-utils-5.0.0-rc.1.tgz#0587c663775e666227d896ebbb365ea9909047d8"
   integrity sha512-rZVTGfSQ0Sqw76BD/Z6iARfnO2r5ICSxt0iIpzjM8w9ohpRtI2B45NrngF0rILwy9d8we4A/n7gQQ0rqwkAX7g==
@@ -10312,7 +10312,7 @@ webpack@^4.0.0:
     watchpack "^1.7.4"
     webpack-sources "^1.4.1"
 
-webpack@^5.54.0:
+webpack@^5.22.0:
   version "5.65.0"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.65.0.tgz#ed2891d9145ba1f0d318e4ea4f89c3fa18e6f9be"
   integrity sha512-Q5or2o6EKs7+oKmJo7LaqZaMOlDWQse9Tm5l1WAfU/ujLGN5Pb0SqGeVkN/4bpPmEqEP5RnVhiqsOtWtUVwGRw==
@@ -10566,7 +10566,7 @@ workbox-sw@6.4.2:
   resolved "https://registry.yarnpkg.com/workbox-sw/-/workbox-sw-6.4.2.tgz#9a6db5f74580915dc2f0dbd47d2ffe057c94a795"
   integrity sha512-A2qdu9TLktfIM5NE/8+yYwfWu+JgDaCkbo5ikrky2c7r9v2X6DcJ+zSLphNHHLwM/0eVk5XVf1mC5HGhYpMhhg==
 
-workbox-webpack-plugin@^6.1.0, workbox-webpack-plugin@^6.4.2:
+workbox-webpack-plugin@^6.1.0:
   version "6.4.2"
   resolved "https://registry.yarnpkg.com/workbox-webpack-plugin/-/workbox-webpack-plugin-6.4.2.tgz#aad9f11b028786d5b781420e68f4e8f570ea9936"
   integrity sha512-CiEwM6kaJRkx1cP5xHksn13abTzUqMHiMMlp5Eh/v4wRcedgDTyv6Uo8+Hg9MurRbHDosO5suaPyF9uwVr4/CQ==

@@ -9,15 +9,14 @@
       offset-y="35"
     >
       <v-btn
-        v-bind="attrs"
-        v-on="on"
         icon
         class="transparent mx-1 grey lighten-3"
         height="40px"
         width="40px"
         @click="setDrawerConv(); SET_VIEWED()"
       >
-        <v-icon color="black">mdi-facebook-messenger</v-icon>
+        <v-icon v-if="$vuetify.breakpoint.width < 500" color="black">mdi-chat-outline</v-icon>
+        <v-icon v-else color="black">mdi-facebook-messenger</v-icon>
       </v-btn>
     </v-badge>
     <v-menu offset-y v-if="$vuetify.breakpoint.width > 1100">

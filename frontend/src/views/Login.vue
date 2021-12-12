@@ -14,7 +14,7 @@
       </v-col>
       <v-col cols="12" class="d-flex justify-center">
         <v-flex class="align-self-start" style="max-width: 400px">
-          <v-card class="my-5 d-flex flex-column justify-center">
+          <v-card class="my-5 d-flex flex-column justify-center" :flat="$vuetify.breakpoint.width < 500">
             <v-form
               ref="form"
               v-model="valid"

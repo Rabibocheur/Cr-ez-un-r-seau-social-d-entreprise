@@ -1,5 +1,5 @@
 <template>
-  <v-card class=" pa-1" style="margin: 0 !important" :class="$vuetify.breakpoint.width < 500 ? 'rounded-0' : 'rounded-lg'" :elevation="$vuetify.breakpoint.width < 500 ? '0' : '1'">
+  <v-card style="margin: 0 !important" :class="$vuetify.breakpoint.width < 500 ? 'rounded-0' : 'rounded-lg pa-1'" :elevation="$vuetify.breakpoint.width < 500 ? '0' : '1'">
     <v-layout class="d-flex mx-3 my-1">
       <router-link :to="`/profile/${user.uuid}`" class="float-left">
         <Avatar :avatar="user.avatar" size="38" />
@@ -8,7 +8,7 @@
         Ecrivez quelque chose...
       </div>
     </v-layout>
-    <v-divider class="my-2"></v-divider>
+    <v-divider :class="$vuetify.breakpoint.width < 500 ? 'mt-2' : 'my-2'"></v-divider>
     <v-btn
       style="width: 100%"
       depressed

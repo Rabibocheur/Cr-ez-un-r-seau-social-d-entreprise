@@ -1,16 +1,19 @@
 <template>
   <div>
     <v-app-bar
-      class="test-bar white"
-      :elevate-on-scroll="$vuetify.breakpoint.width > 500"
-      :elevation="$vuetify.breakpoint.width < 500 ? '0' : ''"
+      class="navbar white"
+      :elevate-on-scroll="true"
+      :elevation="$vuetify.breakpoint.width < 500 ? '15' : '15'"
       :prominent="$vuetify.breakpoint.width < 500"
-      :style="test && $vuetify.breakpoint.width < 500 ? 'top: -53px' : ''"
+      :style="scrollNav && $vuetify.breakpoint.width < 500 ? 'top: -51px' : ''"
       short
       app
       :height="$vuetify.breakpoint.width < 500 ? 100 : ''"
-      :fixed="$vuetify.breakpoint.width < 500 ? test : false"
-      style="border-bottom: 1px solid #a6a6a6ab !important;transition: all 0.1s"
+      :fixed="$vuetify.breakpoint.width < 500 ? scrollNav : false"
+      style="
+        border-bottom: 1px solid #a6a6a6ab !important;
+        transition: all 0.2s;
+      "
     >
       <div
         class="d-flex justify-space-between align-center"
@@ -18,13 +21,13 @@
         v-if="$vuetify.breakpoint.width < 500"
       >
         <img src="/icon-left-font.png" alt="" height="27" />
-        <v-app-bar-nav-icon large @click="setDrawerSearch"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon x-large @click="setDrawerSearch"></v-app-bar-nav-icon>
       </div>
 
-      <div class="d-flex" style="width:100%; height: 100%;">
+      <div class="d-flex" style="width: 100%; height: 100%">
         <div
           class="d-flex flex-row align-center"
-          style="padding-bottom: 1px;"
+          style="padding-bottom: 1px"
           :style="
             $vuetify.breakpoint.width < 1200 ? 'width: 150px' : 'width: 300px'
           "
@@ -36,7 +39,7 @@
             class="btn-home rounded-0 light"
             height="100%"
           >
-            <v-icon large class="icon-home">mdi-home</v-icon>
+            <v-icon style="font-size: 30px" color="#7b7070" class="icon-home">mdi-home</v-icon>
           </v-btn>
 
           <router-link to="/" v-if="$vuetify.breakpoint.width > 500">
@@ -49,7 +52,7 @@
             @click="setDrawerSearch"
             v-if="
               $vuetify.breakpoint.width < 1200 &&
-                $vuetify.breakpoint.width > 500
+              $vuetify.breakpoint.width > 500
             "
           ></v-app-bar-nav-icon>
 
@@ -79,7 +82,7 @@
               to="/"
               depressed
               class="btn-home rounded-0 light"
-              height="100%"
+              height="99%"
             >
               <v-icon large class="icon-home">mdi-home</v-icon>
             </v-btn>
@@ -107,7 +110,7 @@
             </span>
           </v-btn>
 
-          <div class="d-flex flex-row align-center py-1">
+          <div class="d-flex flex-row align-center">
             <DiscussionsMenu @click="setDrawerConv" />
             <Notifications />
             <v-menu transition="slide-x-transition" bottom right>
@@ -120,9 +123,10 @@
                   height="40px"
                   width="40px"
                 >
-                  <v-icon large color="black">
-                    mdi-menu-down
-                  </v-icon>
+                  <v-icon large color="black" v-if="$vuetify.breakpoint.width > 500"> mdi-menu-down </v-icon>
+                  <v-avatar v-else size="28">
+                    <img :src="user.avatar || '../avatar.png'" />
+                  </v-avatar>
                 </v-btn>
               </template>
               <v-card width="300" class="px-2">
@@ -200,18 +204,18 @@ export default {
   },
   data() {
     return {
-      test: false,
+      scrollNav: false,
     };
   },
   mounted() {
     window.addEventListener("scroll", () => {
       const { scrollTop } = document.documentElement;
-      if (scrollTop > 10) this.test = true;
-      else this.test = false;
+      if (scrollTop > 10) this.scrollNav = true;
+      else this.scrollNav = false;
     });
   },
   methods: {
-    ...mapActions(["logout", "search"]),
+    ...mapActions(["logout"]),
     ...mapMutations([
       "SET_DRAWER_SEARCH",
       "SET_DRAWER_CHAT",
@@ -225,8 +229,11 @@ export default {
     },
   },
   computed: {
-    ...mapState(["user"]),
+    ...mapState(["user", "search"]),
     setSearch: {
+      get(){
+        return this.search
+      },
       set(value) {
         this.SET_SEARCH_USER(value);
       },
@@ -236,7 +243,7 @@ export default {
 </script>
 
 <style lang="scss">
-.test-bar > .v-toolbar__content {
+.navbar > .v-toolbar__content {
   padding: 0 16px !important;
   flex-direction: column;
   justify-content: space-between;
@@ -297,7 +304,7 @@ export default {
 @media screen and (max-width: 800px) {
   .btn-home,
   .btn-follow {
-    width: 100px;
+    width: 80px;
   }
 }
 @media screen and (max-width: 500px) {
