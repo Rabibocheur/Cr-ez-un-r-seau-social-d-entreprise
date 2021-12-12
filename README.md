@@ -32,7 +32,9 @@ sequelize db:migrate
 sequelize db:seed:all
 
 ```
+```
+email: bob@test.fr - Password: test1
+email: pat@test.fr - Pasword: test1
+email: admin@test.fr - Password: test1
 
-bob@test.fr - test1
-pat@test.fr - test1
-admin@test.fr - test1
+```
