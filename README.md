@@ -11,7 +11,7 @@ npm run serve
 
 ```
 cd backend
-mdir images
+mkdir images
 npm install
 npm start
 
