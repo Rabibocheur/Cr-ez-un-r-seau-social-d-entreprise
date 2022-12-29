@@ -3,7 +3,11 @@
 Vous êtes développeur depuis plus d'un an chez CONNECT-E, une petite agence web
 regroupant une douzaine d'employés.
 Votre directrice, Stéphanie, vient de signer un nouveau contrat avec Groupomania, un groupe
-spécialisé dans la grande distribution, et l'un des plus Kdèles clients de l'agence
+spécialisé dans la grande distribution, et l'un des plus Kdèles clients de l'agence.
+
+Le projet consiste à construire un réseau social interne pour les employés de Groupomania. Le
+but de cet outil est de faciliter les interactions entre collègues. Le département RH de
+Groupomania a imaginé plusieurs fonctionnalités pour favoriser les échanges entre collègues.
 
 ### Frontend :
 
